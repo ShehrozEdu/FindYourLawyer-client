@@ -112,7 +112,7 @@ export default function NewUSerNavBar() {
               <Link to="/">
                 <img src="/img/logo.png" className="logo mr-0" alt="" />
               <h2 className="ml-3 text-sm text-black dark:text-white">
-                Find Your Lawyer
+                FYL
               </h2>
               </Link>
               <div className="md:hidden">
