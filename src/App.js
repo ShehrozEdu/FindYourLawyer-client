@@ -13,6 +13,7 @@ import Error from "./components/Error";
 import PracticeOverview from "./components/Lawyers/PracticeOverview";
 import ProtectedRoutes from "./components/utils/PrivateRoutes";
 import LoginPage from "./components/LoginPage";
+import Blog from "./components/BlogCRUD/Article/Blog";
 function App() {
   return (
     <Router>
@@ -22,6 +23,7 @@ function App() {
           <Route path={"/"} element={<HomeScreen />} />
           <Route path={"/login"} element={<LoginPage />} />
           <Route path={"/bookings"} element={<Bookings />} />
+            <Route path={"/blogs"} element={<Blog />} />
           <Route path={"/books"} element={<Books />} />
           <Route path={"/services/ipc&crpcs"} element={<IPC />} />
           <Route path={"/lawyersList"} element={<LawyersList />} />
