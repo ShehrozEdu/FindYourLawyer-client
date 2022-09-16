@@ -108,7 +108,7 @@ export default function NewUSerNavBar() {
         <div className="justify-between px-4 mx-auto lg:max-w-7xl md:items-center md:flex md:px-8">
           <div>
             <div className="flex items-center justify-between py-3 md:py-5 md:block">
-              <Link to="/" className="mr-0 ">
+              <Link to="/" style={{ margin: 0 }} ">
                 <img src="/img/logo.png" className="logo mr-0" alt="" />
               </Link>
               <h2 className="ml-3 text-sm text-black dark:text-white">
