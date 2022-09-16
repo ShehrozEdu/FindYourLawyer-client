@@ -150,7 +150,7 @@ export default function NewUSerNavBar() {
               </div>
             </div>
           </div>
-      <h2 className="ml-3 text-sm text-black dark:text-white">
+      <h2 className="ml-3 text-xl fw-bold text-black dark:text-white">
                 FindYourLawyer
               </h2>
           <div>
