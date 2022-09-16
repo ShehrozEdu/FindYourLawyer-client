@@ -107,8 +107,9 @@ export default function NewUSerNavBar() {
       <nav className="w-full bg-white dark:bg-gray-900 shadow">
         <div className="justify-between px-4 mx-auto lg:max-w-7xl md:items-center md:flex md:px-8">
           <div>
-           <Link to="/">
+           
             <div className="flex items-center justify-between py-3 md:py-5 md:block">
+              <Link to="/">
                 <img src="/img/logo.png" className="logo mr-0" alt="" />
               <h2 className="ml-3 text-sm text-black dark:text-white">
                 Find Your Lawyer
