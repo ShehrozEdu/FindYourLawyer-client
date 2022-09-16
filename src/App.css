@@ -43,7 +43,7 @@ body {
 .logo {
   width: 30px;
   height: 30px;
-  margin: 0;
+  margin: 0 !important;
   /* filter: invert(100%) sepia(0%) saturate(7495%) hue-rotate(348deg)
     brightness(101%) contrast(102%); */
 }
