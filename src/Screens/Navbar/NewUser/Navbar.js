@@ -111,9 +111,6 @@ export default function NewUSerNavBar() {
             <div className="flex items-center justify-between py-3 md:py-5 md:block">
               <Link to="/">
                 <img src="/img/logo.png" className="logo mr-0" alt="" />
-              <h2 className="ml-3 text-sm text-black dark:text-white">
-                FYL
-              </h2>
               </Link>
               <div className="md:hidden">
                 <button
@@ -153,6 +150,9 @@ export default function NewUSerNavBar() {
               </div>
             </div>
           </div>
+      <h2 className="ml-3 text-sm text-black dark:text-white">
+                FindYourLawyer
+              </h2>
           <div>
             {userLogin === null ? (
               <div
