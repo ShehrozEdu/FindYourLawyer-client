@@ -107,13 +107,13 @@ export default function NewUSerNavBar() {
       <nav className="w-full bg-white dark:bg-gray-900 shadow">
         <div className="justify-between px-4 mx-auto lg:max-w-7xl md:items-center md:flex md:px-8">
           <div>
+           <Link to="/" style={{ margin: 0 }} ">
             <div className="flex items-center justify-between py-3 md:py-5 md:block">
-              <Link to="/" style={{ margin: 0 }} ">
                 <img src="/img/logo.png" className="logo mr-0" alt="" />
-              </Link>
               <h2 className="ml-3 text-sm text-black dark:text-white">
                 Find Your Lawyer
               </h2>
+              </Link>
               <div className="md:hidden">
                 <button
                   className="p-2 text-gray-700 rounded-md outline-none focus:border-gray-400 focus:border"
