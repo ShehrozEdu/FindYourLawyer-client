@@ -23,7 +23,7 @@ export default function TrustedPartners() {
               <div className="h-full flex flex-col items-center text-center">
                 <img
                   alt="team"
-                  className="flex-shrink-0 rounded-lg w-50 h-56 object-cover object-center mb-4 mt-10 "
+                  className="flex-shrink-0 rounded-lg w-50 h-56 object-cover object-center mb-4 mt-1 "
                   src="img/tata.png"
                 />
               </div>
@@ -32,7 +32,7 @@ export default function TrustedPartners() {
               <div className="h-full flex flex-col items-center text-center">
                 <img
                   alt="team"
-                  className="flex-shrink-0 rounded-lg w-50 h-40 object-cover object-center mb-4 mt-10 lg:ml-0 ml-14"
+                  className="flex-shrink-0 rounded-lg w-40 h-30 object-cover object-center mb-4 mt-1 lg:ml-0 ml-8"
                   src="img/amazon.png"
                 />
               </div>
@@ -41,16 +41,16 @@ export default function TrustedPartners() {
               <div className="h-full flex flex-col items-center text-center">
                 <img
                   alt="team"
-                  className="flex-shrink-0 rounded-lg w-full h-48 object-cover object-center lg:mb-4 mb-2"
+                  className="flex-shrink-0 rounded-lg w-50 h-40 object-cover object-center  mb-4 mt-1 lg:ml-0 ml-2"
                   src="img/tesla.png"
                 />
               </div>
             </div>
-            <div className="lg:p-24 p-32 lg:w-1/4 md:w-1/2 ">
+            <div className="lg:p-24 p-28 lg:w-1/4 md:w-1/2 ">
               <div className=" flex flex-col items-center text-center">
                 <img
                   alt="team"
-                  className="flex-shrink-0 rounded-lg w-full h-34 object-cover object-center mb-4 ml-2 mr-3 icici"
+                  className="flex-shrink-0 rounded-lgw-full h-34 object-cover object-center mb-4 ml-2 mt-0 mr-3 icici"
                   src="img/icici.png"
                 />
               </div>
