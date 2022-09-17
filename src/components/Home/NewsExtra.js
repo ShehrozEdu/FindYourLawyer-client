@@ -153,11 +153,11 @@ export default function NewsExtra() {
             </div>
           </div>
           <div className="relative flex col-span-12 bg-center newsBack bg-no-repeat bg-cover dark:bg-gray-500 xl:col-span-6 lg:col-span-5 md:col-span-9 min-h-96">
-            <span className="absolute px-1 pb-2 text-xs font-bold uppercase border-b-2 left-20 top-16 dark:border-violet-400 dark:text-gray-100">
+            <span className="absolute px-1 pb-2 text-xs font-bold uppercase border-b-2 left-20 top-14 dark:border-violet-400 dark:text-gray-100">
               Law, Legal
             </span>
             <a className="flex flex-col items-center justify-end p-14 text-center sm:p-8 group dark:via-transparent flex-grow-1 bg-gradient-to-b dark:from-gray-900 dark:to-gray-900">
-              <span className="flex items-center mb-4 space-x-2 dark:text-violet-400">
+              <span className="flex items-center mb-12 space-x-2 dark:text-violet-400">
                 <span className="relative flex-shrink-0 w-2 h-2 rounded-full dark:bg-violet-400">
                   <span className="absolute flex-shrink-0 w-3 h-3 rounded-full -left-1 -top-1 animate-ping dark:bg-violet-400"></span>
                 </span>
