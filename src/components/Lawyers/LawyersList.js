@@ -9,7 +9,7 @@ export default function LawyersList() {
   let [sortLawyers, setSortLawyers] = useState([]);
   const params = useParams();
   let getLawyerData = async () => {
-    let URL = "http://localhost:5000/api/lawyersList/?lid=" + params.id;
+    let URL = "https://find-your-lawyer.herokuapp.com/api/lawyersList/?lid=" + params.id;
 
     try {
       let response = await axios.get(URL);

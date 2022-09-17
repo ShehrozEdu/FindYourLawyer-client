@@ -7,7 +7,7 @@ export default function TopLawyers() {
 
   let getTopLawyersData = async () => {
     try {
-      let URL = "http://localhost:5000/api/topLawyers";
+      let URL = "https://find-your-lawyer.herokuapp.com/api/topLawyers";
       let response = await axios.get(URL);
       let { status, TopLawyers } = response.data;
       if (status) {

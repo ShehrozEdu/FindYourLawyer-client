@@ -23,7 +23,9 @@ async function displayRazorpay() {
     // return;
   }
 
-  const result = await axios.post("http://localhost:5000/payment/orders");
+  const result = await axios.post(
+    "https://find-your-lawyer.herokuapp.com/payment/orders"
+  );
 
   if (!result) {
     alert("Server error. Are you online?");
@@ -31,7 +33,7 @@ async function displayRazorpay() {
   }
 
   const { amount, id: order_id, currency } = result.data;
-  console.log(result.data)
+  console.log(result.data);
 
   const options = {
     key: "rzp_test_Gaer6wsOr2pz3k", // Enter the Key ID generated from the Dashboard
@@ -50,7 +52,7 @@ async function displayRazorpay() {
       };
 
       const result = await axios.post(
-        "http://localhost:5000/payment/success",
+        "https://find-your-lawyer.herokuapp.com/payment/success",
         data
       );
 
@@ -84,7 +86,8 @@ export default function PracticeOverview() {
   //--------------------------
 
   let getPracticeID = async () => {
-    let URL = "http://localhost:5000/api/getpracticebyid/" + params.id;
+    let URL =
+      "https://find-your-lawyer.herokuapp.com/api/getpracticebyid/" + params.id;
     try {
       let response = await axios.get(URL);
 
@@ -105,7 +108,9 @@ export default function PracticeOverview() {
     getPracticeID();
   }, []);
   let getLawyerData = async () => {
-    let URL = "http://localhost:5000/api/lawyersList/?lid=" + params.id;
+    let URL =
+      "https://find-your-lawyer.herokuapp.com/api/lawyersList/?lid=" +
+      params.id;
     // console.log(params.id);
 
     try {

@@ -7,7 +7,7 @@ export default function Bookings() {
   let [sort, setSort] = useState("");
 
   let BookingsData = async () => {
-    let URL = "http://localhost:5000/api/practices";
+    let URL = "https://find-your-lawyer.herokuapp.com/api/practices";
     let response = await axios.get(URL);
     let { status, Practice } = response.data;
     // console.log(response.data);
