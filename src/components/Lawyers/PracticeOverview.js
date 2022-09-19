@@ -1,79 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import Swal from "sweetalert2";
 // import ModalPop from "./ModalPop";
-function loadScript(src) {
-  return new Promise((resolve) => {
-    const script = document.createElement("script");
-    script.src = src;
-    script.onload = () => {
-      resolve(true);
-    };
-    script.onerror = () => {
-      resolve(false);
-    };
-    document.body.appendChild(script);
-  });
-}
-async function displayRazorpay() {
-  const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
 
-  if (!res) {
-    alert("Razorpay SDK failed to load. Are you online?");
-    // return;
-  }
-
-  const result = await axios.post(
-    "https://find-your-lawyer.herokuapp.com/payment/orders"
-  );
-
-  if (!result) {
-    alert("Server error. Are you online?");
-    // return;
-  }
-
-  const { amount, id: order_id, currency } = result.data;
-  console.log(result.data);
-
-  const options = {
-    key: "rzp_test_Gaer6wsOr2pz3k", // Enter the Key ID generated from the Dashboard
-    amount: amount.toString(),
-    currency: currency,
-    name: "LawyerBookingConfirmation",
-    description: "Test Transaction",
-    // image: { logo },
-    order_id: order_id,
-    handler: async function (response) {
-      const data = {
-        orderCreationId: order_id,
-        razorpayPaymentId: response.razorpay_payment_id,
-        razorpayOrderId: response.razorpay_order_id,
-        razorpaySignature: response.razorpay_signature,
-      };
-
-      const result = await axios.post(
-        "https://find-your-lawyer.herokuapp.com/payment/success",
-        data
-      );
-
-      alert(result.data.msg);
-    },
-    prefill: {
-      name: "Shehroz",
-      email: "findyourlawyer@null.com",
-      contact: "9999999999",
-    },
-    notes: {
-      address: "Example Corporate Office",
-    },
-    theme: {
-      color: "#61dafb",
-    },
-  };
-
-  const paymentObject = new window.Razorpay(options);
-  paymentObject.open();
-}
 export default function PracticeOverview() {
   let [practice, setPractice] = useState([]);
   let [lawyer, setLawyer] = useState([]);
@@ -81,13 +11,78 @@ export default function PracticeOverview() {
   const params = useParams();
   //RAZORPAY
 
+  let loadScript = async () => {
+    const scriptElement = document.createElement("script");
+    scriptElement.src = "https://checkout.razorpay.com/v1/checkout.js";
+    scriptElement.onload = () => {
+      return true;
+    };
+    scriptElement.onerror = () => {
+      return false;
+    };
+    document.body.appendChild(scriptElement);
+  };
+  let makePayment = async (amount) => {
+    let isLoaded = await loadScript();
+    if (isLoaded === false) {
+      alert("Unable load payment sdk");
+      return false;
+    }
+
+    let URL = "http://localhost:5000/api/payment";
+    let sendData = {
+      amount: amount,
+      email: "findyourlawyer@gmail.com",
+    };
+
+    let { data } = await axios.post(URL, sendData);
+    let { order } = data;
+
+    var options = {
+      key: "rzp_test_Gaer6wsOr2pz3k",
+      amount: order.amount,
+      currency: "INR",
+      name: "FindYourLawyer",
+      description: "Cheap and the best!",
+      image:
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Balanced_scale_of_Justice.svg/2560px-Balanced_scale_of_Justice.svg.png",
+      order_id: order.id,
+      handler: async function (response) {
+        let URL = "http://localhost:5000/api/callback";
+        let sendData = {
+          payment_id: response.razorpay_payment_id,
+          order_id: response.razorpay_order_id,
+          signature: response.razorpay_signature,
+        };
+
+        let { data } = await axios.post(URL, sendData);
+        if (data.status === true) {
+          Swal.fire({
+            icon: "success",
+            title: "payment Successful",
+          }).then(() => {
+            window.location.assign("/"); //send home page
+          });
+        } else {
+          alert("payment fails, try again.");
+        }
+      },
+      prefill: {
+        name: "FindYourLawyer",
+        email: "FindYourLawyer@gmail.com",
+        contact: "987654321",
+      },
+    };
+    var paymentObject = new window.Razorpay(options);
+    paymentObject.open();
+  };
+
   //--------------------------
   //RP ENDS
   //--------------------------
 
   let getPracticeID = async () => {
-    let URL =
-      "https://find-your-lawyer.herokuapp.com/api/getpracticebyid/" + params.id;
+    let URL = "http://localhost:5000/api/getpracticebyid/" + params.id;
     try {
       let response = await axios.get(URL);
 
@@ -108,9 +103,7 @@ export default function PracticeOverview() {
     getPracticeID();
   }, []);
   let getLawyerData = async () => {
-    let URL =
-      "https://find-your-lawyer.herokuapp.com/api/lawyersList/?lid=" +
-      params.id;
+    let URL = "http://localhost:5000/api/lawyersList/?lid=" + params.id;
     // console.log(params.id);
 
     try {
@@ -205,7 +198,9 @@ export default function PracticeOverview() {
                                       <div className="flex justify-center">
                                         <button
                                           className="inline-flex text-white bg-amber-500 border-0 py-2 px-6 focus:outline-none hover:bg-amber-600 rounded text-lg"
-                                          onClick={displayRazorpay}
+                                          onClick={() =>
+                                            makePayment(adv.amount)
+                                          }
                                         >
                                           Book
                                         </button>
