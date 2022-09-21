@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import BookingsBox from "./BookingsBox";
+import LoadingSkeleton from "./utils/LoadingSkelton";
 
 export default function Bookings() {
   let [booking, setBooking] = useState([]);
@@ -72,27 +73,35 @@ export default function Bookings() {
           </div>
 
           {/* //Mapping */}
-          <div className="flex flex-wrap -m-4">
-            {booking
-              .filter((book) => {
-                if (sort === "") {
-                  return book;
-                } else if (
-                  book.title.toLowerCase().includes(sort.toLowerCase())
-                ) {
-                  return book;
-                }
-              })
-              .map((book) => {
-                return (
-                  <BookingsBox
-                    book={book}
-                    key={book._id}
-                    // lawyersList={lawyersList}
-                  />
-                );
-              })}
-          </div>
+          {isLoading ? (
+            <div className="flex flex-wrap -m-4">
+              <LoadingSkeleton />
+            </div>
+          ) : (
+            <div className="flex flex-wrap -m-4">
+              {booking
+                .filter((book) => {
+                  if (sort === "") {
+                    return book;
+                  } else if (
+                    book.title.toLowerCase().includes(sort.toLowerCase())
+                  ) {
+                    return book;
+                  }
+                })
+                .map((book) => {
+                  return (
+                    <BookingsBox
+                      book={book}
+                      key={book._id}
+                      isLoading={isLoading}
+                      setIsLoading={setIsLoading}
+                      // lawyersList={lawyersList}
+                    />
+                  );
+                })}
+            </div>
+          )}
         </div>
       </section>
     </>
