@@ -6,6 +6,7 @@ import LoadingSkeleton from "./utils/LoadingSkelton";
 export default function Bookings() {
   let [booking, setBooking] = useState([]);
   let [sort, setSort] = useState("");
+  let [isLoading, setIsLoading] = useState(true);
 
   let BookingsData = async () => {
     let URL = "https://find-your-lawyer.herokuapp.com/api/practices";
@@ -16,6 +17,7 @@ export default function Bookings() {
     try {
       if (status) {
         setBooking([...Practice]);
+        setIsLoading(false);
       } else {
         alert("Please Enter Valid Choice");
       }
