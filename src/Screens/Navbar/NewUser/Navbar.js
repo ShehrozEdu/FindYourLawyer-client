@@ -78,6 +78,7 @@ export default function NewUSerNavBar() {
                               Login With Google
                             </p>
                             <GoogleLogin
+                              shape={"circle"}                              
                               onSuccess={(credentialResponse) => {
                                 onSuccess(credentialResponse);
                               }}
