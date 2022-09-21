@@ -33,25 +33,31 @@ export default function LoginPage() {
   }, []);
   return (
     <>
-      {/* <Navbar bg="bg-danger" login="d-none" /> */}
-      <div className="d-flex justify-content-between align-content-center marginSearch  mt-5 Poppins fw-bolder ">
-        <h1>Login with Google to continue</h1>{" "}
-      </div>
-      <div className="d-flex justify-content-center shadow marginLeft col-7   mt-5 ">
-        <GoogleOAuthProvider clientId="263148022359-f2gtatcn7s3afukeqjf877ooee8rmgjg.apps.googleusercontent.com">
-          <div className=" d-flex flex-column align-items-center py-3">
-            {
-              <GoogleLogin
-                onSuccess={(credentialResponse) => {
-                  onSuccess(credentialResponse);
-                }}
-                onError={() => {
-                  onError();
-                }}
-              />
-            }
-          </div>
-        </GoogleOAuthProvider>
+      <div className="bg-slate-300 mt-24 lg:mx-36 mx-0">
+        <div className="flex justify-between align-center lg:ml-80 ml-24 mt-5 Poppins font-bold ">
+          <h1 className="lg:ml-34 md:ml-34 ml-20 text-xl mt-5  text-amber-600">
+            Login with Google to continue
+          </h1>
+        </div>
+        <div className="flex justify-content-center shadow mt-5 ">
+          <GoogleOAuthProvider clientId="263148022359-f2gtatcn7s3afukeqjf877ooee8rmgjg.apps.googleusercontent.com">
+            <div className=" flex flex-col align-center lg:ml-96 ml-24 py-3">
+              {
+                <GoogleLogin
+                  width={400}
+                  logo_alignment={"center"}
+                  shape={"circle"}
+                  onSuccess={(credentialResponse) => {
+                    onSuccess(credentialResponse);
+                  }}
+                  onError={() => {
+                    onError();
+                  }}
+                />
+              }
+            </div>
+          </GoogleOAuthProvider>
+        </div>
       </div>
     </>
   );
