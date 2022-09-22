@@ -70,7 +70,7 @@ export default function PracticeOverview() {
       prefill: {
         name: "FindYourLawyer",
         email: "FindYourLawyer@gmail.com",
-        contact: "987654321",
+        contact: "9876543215",
       },
     };
     var paymentObject = new window.Razorpay(options);
