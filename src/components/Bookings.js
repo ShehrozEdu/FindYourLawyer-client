@@ -9,7 +9,7 @@ export default function Bookings() {
   let [isLoading, setIsLoading] = useState(true);
 
   let BookingsData = async () => {
-    let URL = "https://find-your-lawyer.herokuapp.com/api/practices";
+    let URL = "https://find-your-lawyer-server.vercel.app/api/practices";
     let response = await axios.get(URL);
     let { status, Practice } = response.data;
     // console.log(response.data);

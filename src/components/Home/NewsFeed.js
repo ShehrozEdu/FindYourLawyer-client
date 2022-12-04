@@ -7,7 +7,7 @@ export default function NewsFeed() {
 
   let getNewsData = async () => {
     try {
-      let URL = "https://find-your-lawyer.herokuapp.com/api/news";
+      let URL = "https://find-your-lawyer-server.vercel.app/api/news";
       let response = await axios.get(URL);
       let { status, News } = response.data;
       if (status) {

@@ -7,7 +7,7 @@ export default function TopLawyers() {
 
   let getTopLawyersData = async () => {
     try {
-      let URL = "https://find-your-lawyer.herokuapp.com/api/topLawyers";
+      let URL = "https://find-your-lawyer-server.vercel.app/api/topLawyers";
       let response = await axios.get(URL);
       let { status, TopLawyers } = response.data;
       if (status) {

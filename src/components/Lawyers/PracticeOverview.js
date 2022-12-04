@@ -29,7 +29,7 @@ export default function PracticeOverview() {
       return false;
     }
 
-    let URL = "https://find-your-lawyer.herokuapp.com/api/payment";
+    let URL = "https://find-your-lawyer-server.vercel.app/api/payment";
     let sendData = {
       amount: amount,
       email: "findyourlawyer@gmail.com",
@@ -48,7 +48,7 @@ export default function PracticeOverview() {
         "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Balanced_scale_of_Justice.svg/2560px-Balanced_scale_of_Justice.svg.png",
       order_id: order.id,
       handler: async function (response) {
-        let URL = "https://find-your-lawyer.herokuapp.com/api/callback";
+        let URL = "https://find-your-lawyer-server.vercel.app/api/callback";
         let sendData = {
           payment_id: response.razorpay_payment_id,
           order_id: response.razorpay_order_id,
@@ -82,7 +82,9 @@ export default function PracticeOverview() {
   //--------------------------
 
   let getPracticeID = async () => {
-    let URL = "https://find-your-lawyer.herokuapp.com/api/getpracticebyid/" + params.id;
+    let URL =
+      "https://find-your-lawyer-server.vercel.app/api/getpracticebyid/" +
+      params.id;
     try {
       let response = await axios.get(URL);
 
@@ -103,7 +105,9 @@ export default function PracticeOverview() {
     getPracticeID();
   }, []);
   let getLawyerData = async () => {
-    let URL = "https://find-your-lawyer.herokuapp.com/api/lawyersList/?lid=" + params.id;
+    let URL =
+      "https://find-your-lawyer-server.vercel.app/api/lawyersList/?lid=" +
+      params.id;
     // console.log(params.id);
 
     try {
