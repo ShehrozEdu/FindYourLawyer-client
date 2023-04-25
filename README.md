@@ -1,5 +1,3 @@
-Sure, here's a sample README.md file for both the front-end and back-end projects using HTML tags:
-
 <h1>Find your Lawyer</h1>
 
 <p>
