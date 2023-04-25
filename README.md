@@ -1,70 +1,132 @@
-# Getting Started with Create React App
+Sure, here's a sample README.md file for both the front-end and back-end projects using HTML tags:
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+<h1>Find your Lawyer</h1>
 
-## Available Scripts
+<p>
+Find your Lawyer is a full-stack web application that helps people find and connect with lawyers for their legal needs. The front-end is built using React, Redux, and various other libraries, while the back-end is built using Node.js with MongoDB.
+</p>
 
-In the project directory, you can run:
+<h2>Front-end</h2>
 
-### `npm start`
+<p>
+Find your Lawyer front-end is a single-page application that provides an intuitive user interface to interact with the backend server. It utilizes various libraries and frameworks to provide a responsive, fast, and seamless experience for users. 
+</p>
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+<h3>Features</h3>
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+<ul>
+  <li>User authentication and authorization using Google OAuth</li>
+  <li>Lawyer search by location and legal category</li>
+  <li>Lawyer profiles with details such as experience, fees, and contact information</li>
+  <li>Booking system to schedule appointments with lawyers</li>
+  <li>Payment integration using Razorpay</li>
+  <li>User dashboard to manage bookings and payments</li>
+</ul>
 
-### `npm test`
+<h3>Getting started</h3>
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+<p>
+To get started with this project, clone the repository and install the required dependencies:
+</p>
 
-### `npm run build`
+<pre><code>$ git clone https://github.com/yourusername/find-your-lawyer.git
+$ cd find-your-lawyer
+$ npm install
+</code></pre>
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+<p>
+To run the development server:
+</p>
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+<pre><code>$ npm start</code></pre>
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+<p>
+Open <a href="http://localhost:3000">http://localhost:3000</a> to view the app in the browser.
+</p>
 
-### `npm run eject`
+<h3>Tech stack</h3>
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+<ul>
+  <li>React</li>
+  <li>Redux</li>
+  <li>Node.js</li>
+  <li>MongoDB</li>
+</ul>
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+<h3>Contributing</h3>
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+<p>
+Contributions are always welcome! Please open an issue or a pull request if you have any suggestions or feature requests.
+</p>
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+<h3>License</h3>
 
-## Learn More
+<p>
+This project is licensed under the MIT License - see the <a href="LICENSE">LICENSE</a> file for details.
+</p>
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+<h2>Back-end</h2>
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+<p>
+Find your Lawyer back-end is a Node.js application that provides a RESTful API for the front-end to interact with the MongoDB database. It uses various middleware and libraries to handle requests, authentication, and authorization.
+</p>
 
-### Code Splitting
+<h3>Getting started</h3>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+<p>
+To get started with this project, clone the repository and install the required dependencies:
+</p>
 
-### Analyzing the Bundle Size
+<pre><code>$ git clone https://github.com/yourusername/find-your-lawyer-backend.git
+$ cd find-your-lawyer-backend
+$ npm install
+</code></pre>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+<p>
+To run the development server:
+</p>
 
-### Making a Progressive Web App
+<pre><code>$ npm start</code></pre>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+<p>
+The server will start listening on port 5000 by default. You can modify the port in the `app.js` file.
+</p>
 
-### Advanced Configuration
+<h3>Tech stack</h3>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+<ul>
+  <li>Node.js</li>
+  <li>MongoDB</li>
+  <li>Express</li>
+  <li>jsonwebtoken</li>
+  <li>bcrypt</li>
+  <li>cors</li>
+</ul>
 
-### Deployment
+<h3>Contributing</h3>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+<p>
+Contributions are always welcome! Please open an issue or a pull request if you have any suggestions or feature requests.
+</p>
 
-### `npm run build` fails to minify
+<h3>Backend:</h3>
+<p>The back-end of the application is built using Node.js and Express.js. It utilizes various libraries such as bcrypt for password hashing, cors for handling cross-origin requests, and JSON Web Tokens for user authentication. The application uses MongoDB for database storage and mongoose for data modeling. It also uses the nodemon package for live reloading during development.</p>
+<p>The application uses the Razorpay payment gateway for payment processing. It also generates unique identifiers for various entities such as user IDs and order IDs using the uuid package.</p>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+<h3>Installation and Usage:</h3>
+<p>To use the application, follow these steps:</p>
+<ol>
+  <li>Clone the repository to your local machine.</li>
+  <li>Install the required dependencies for the front-end and back-end using npm install in their respective directories.</li>
+  <li>Create a .env file in the back-end directory with the following keys and their respective values:</li>
+  <ul>
+    <li>PORT - Port number for the server (default is 5000).</li>
+    <li>MONGO_URI - MongoDB connection URI.</li>
+    <li>JWT_SECRET - Secret key for JSON Web Tokens.</li>
+    <li>RAZORPAY_KEY_ID - Razorpay API key ID.</li>
+    <li>RAZORPAY_KEY_SECRET - Razorpay API key secret.</li>
+  </ul>
+  <li>Start the back-end server using npm start in the back-end directory.</li>
+  <li>Start the front-end server using npm start in the front-end directory.</li>
+  <li>The application should now be running on localhost:3000 in your browser.</li>
+</ol>
