@@ -45,8 +45,9 @@ Open <a href="http://localhost:3000">http://localhost:3000</a> to view the app i
 
 <ul>
   <li>React</li>
-  <li>Redux</li>
+  <li>Tailwind CSS</li>
   <li>Node.js</li>
+  <li>Express.js</li>
   <li>MongoDB</li>
 </ul>
 
