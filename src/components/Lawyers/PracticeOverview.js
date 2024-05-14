@@ -1,15 +1,39 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
+import {
+  Button,
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+} from "@material-tailwind/react";
+
 // import ModalPop from "./ModalPop";
 
 export default function PracticeOverview() {
   let [practice, setPractice] = useState([]);
   let [lawyer, setLawyer] = useState([]);
   let [showModal, setShowModal] = useState(false);
+  // let [showDescModal, setShowDescModal] = useState(false);
+  // let [descriptionText, setDescriptionText] = useState({});
   const params = useParams();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [caseDescription, setCaseDescription] = useState("");
+  const [selectedLawyerId, setSelectedLawyerId] = useState(null);
+  const [toggleSubmissionOfCase, setToggleSubmissionOfCase] = useState(false);
+  const navigate = useNavigate();
+  // Update selectedLawyerId when clicking on "Book" button
+  const handleBookClick = (lawyerId) => {
+    setSelectedLawyerId(lawyerId);
+    // console.log(lawyerId)
+  };
   //RAZORPAY
+  const clientName = JSON.parse(localStorage.getItem("auth_token1"))?.FirstName;
+  const clientEmail = JSON.parse(localStorage.getItem("auth_token1"))?.email;
+  // Check if user is logged in
+  const isLoggedIn = localStorage.getItem("auth_token1") !== null;
 
   let loadScript = async () => {
     const scriptElement = document.createElement("script");
@@ -22,17 +46,18 @@ export default function PracticeOverview() {
     };
     document.body.appendChild(scriptElement);
   };
-  let makePayment = async (amount) => {
+  let makePayment = async (amount, name) => {
     let isLoaded = await loadScript();
     if (isLoaded === false) {
       alert("Unable load payment sdk");
       return false;
     }
 
-    let URL = "https://find-your-lawyer-server.vercel.app/api/payment";
+    let URL = "http://localhost:5000/api/payment";
+    const clientEmail = JSON.parse(localStorage.getItem("auth_token1")).email;
     let sendData = {
       amount: amount,
-      email: "findyourlawyer@gmail.com",
+      email: clientEmail,
     };
 
     let { data } = await axios.post(URL, sendData);
@@ -48,7 +73,7 @@ export default function PracticeOverview() {
         "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Balanced_scale_of_Justice.svg/2560px-Balanced_scale_of_Justice.svg.png",
       order_id: order.id,
       handler: async function (response) {
-        let URL = "https://find-your-lawyer-server.vercel.app/api/callback";
+        let URL = "http://localhost:5000/api/callback";
         let sendData = {
           payment_id: response.razorpay_payment_id,
           order_id: response.razorpay_order_id,
@@ -61,15 +86,16 @@ export default function PracticeOverview() {
             icon: "success",
             title: "payment Successful",
           }).then(() => {
-            window.location.assign("/"); //send home page
+            setDialogOpen(true);
+            handleSubmit();
           });
         } else {
           alert("payment fails, try again.");
         }
       },
       prefill: {
-        name: "FindYourLawyer",
-        email: "FindYourLawyer@gmail.com",
+        name: name,
+        email: clientEmail,
         contact: "9876543215",
       },
     };
@@ -82,9 +108,7 @@ export default function PracticeOverview() {
   //--------------------------
 
   let getPracticeID = async () => {
-    let URL =
-      "https://find-your-lawyer-server.vercel.app/api/getpracticebyid/" +
-      params.id;
+    let URL = "http://localhost:5000/api/getpracticebyid/" + params.id;
     try {
       let response = await axios.get(URL);
 
@@ -104,34 +128,83 @@ export default function PracticeOverview() {
   useEffect(() => {
     getPracticeID();
   }, []);
-  let getLawyerData = async () => {
-    let URL =
-      "https://find-your-lawyer-server.vercel.app/api/lawyersList/?lid=" +
-      params.id;
-    // console.log(params.id);
-
+  let getLawyerData = async (expertise) => {
+    let URL = `http://localhost:5000/api/lawyersListExpertise?expertise=${expertise}`;
     try {
       let response = await axios.get(URL);
-      let { status, LawyersList } = response.data;
-      // console.log(response.data);
+      let { status, lawyers } = response.data;
       if (status) {
-        setLawyer([...LawyersList]);
+        setLawyer(lawyers);
+        // console.log(lawyers)
       } else {
-        alert("Sorry,can't find any lawyer for this");
+        alert("Sorry, can't find any lawyers.");
       }
     } catch (error) {
-      alert(error);
+      console.log("Error fetching lawyers data: " + error);
     }
   };
+
   useEffect(() => {
     getLawyerData();
     // console.log(getLawyerData);
   }, []);
+  useEffect(() => {
+    if (practice && practice.title) {
+      getLawyerData(practice.title);
+    }
+  }, [practice]);
 
+  // console.log(parsedClientId._id);
+
+  //HandleSubmit:
+
+  const handleSubmit = async () => {
+    try {
+      if (!isLoggedIn) {
+        // Handle unauthenticated user
+        return;
+      }
+      const clientId = JSON.parse(localStorage.getItem("auth_token1"))._id;
+
+      if (!selectedLawyerId) {
+        Swal.fire({
+          text: "No lawyer selected",
+        });
+        return;
+      }
+
+      if (!caseDescription) {
+        Swal.fire({
+          text: "Case description cannot be empty",
+        });
+        return;
+      }
+
+      const response = await axios.post(
+        "http://localhost:5000/api/case-requests/create",
+        {
+          client: clientId,
+          lawyerId: selectedLawyerId,
+          description: caseDescription,
+          // income:lawyer.FeePerCase,
+          clientName: clientName,
+        }
+      );
+      console.log(response);
+
+      console.log("Case request submitted successfully");
+      Swal.fire("Case request submitted successfully");
+      setCaseDescription("");
+      setDialogOpen(false);
+    } catch (error) {
+      console.error("Error submitting case request:", error);
+    }
+  };
+  const idOfLawyer = JSON.parse(localStorage?.getItem("auth_token1"))?._id;
   return (
     <>
       <section className="text-gray-600 body-font  dark:bg-gray-800">
-        <div className="container px-5 py-24 mx-auto flex flex-col">
+        <div className="container px-5 py-5 mx-auto flex flex-col">
           <div className="lg:w-4/6 mx-auto">
             <div className="rounded-lg h-100 overflow-hidden">
               <img
@@ -142,20 +215,38 @@ export default function PracticeOverview() {
             </div>
             <div className="flex flex-col sm:flex-row mt-10">
               <div className="sm:w-4/3 sm:pl-8 sm:py-8 sm:border-l border-gray-200 sm:border-t-0 border-t mt-4 pt-4 sm:mt-0 text-center sm:text-left">
-                <h2 className="title-font text-2xl font-medium text-gray-900 mt-6 mb-3 dark:text-white">
+                <h2 className="text-2xl font-extrabold text-gradient bg-gradient-to-r from-amber-600 to-red-500 bg-clip-text text-transparent mb-3 dark:text-white">
                   {practice.title}
                 </h2>
-                <p className="leading-relaxed text-lg mb-4 dark:text-white  ">
+                <p className="leading-relaxed text-lg mb-4 dark:text-white text-gradient bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                   {practice.description}
                 </p>
 
-                <button
-                  className=" text-black bg-pink-300 hover:bg-pink-500  font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none flex mx-auto mt-3 ease-linear transition-all duration-150"
-                  type="button"
-                  onClick={() => setShowModal(true)}
-                >
-                  Book your Lawyer
-                </button>
+                <div className="flex justify-center">
+                  {/* Ensure the parent container is centered */}
+                  {/* // Example of conditional rendering for the "Book" button */}
+                  {isLoggedIn ? (
+                    // Content for authenticated user
+                    <div className="flex justify-center">
+                      <button
+                        className="gradient-button text-black font-semibold text-sm uppercase px-8 py-3 rounded-md shadow-md hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-300 ease-in-out mx-auto"
+                        type="button"
+                        onClick={() => setShowModal(true)}
+                      >
+                        Book a Lawyer Now
+                      </button>
+                    </div>
+                  ) : (
+                    // Content for unauthenticated user
+                    <Button
+                      className="text-red-500"
+                      onClick={() => navigate("/signup")}
+                    >
+                      Please log in to book a lawyer.
+                    </Button>
+                  )}
+                </div>
+
                 {/* --------------------------------------------------------------------------------- */}
                 {/* <MODAL STARTS> */}
                 {/* --------------------------------------------------------------------------------- */}
@@ -174,54 +265,72 @@ export default function PracticeOverview() {
                             </h3>
                           </div>
                           {/*MODAL body*/}
-                          {lawyer.map((adv, index) => {
-                            return (
-                              <div
-                                className="relative p-6 flex-auto"
-                                key={index}
-                              >
-                                <section className="text-gray-600 body-font">
-                                  <div className="container mx-auto flex px-5  md:flex-row flex-col items-center">
-                                    <div className="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-16 md:mb-0 items-center text-center">
-                                      <h3 className="title-font sm:text-2xl text-xl mb-2 font-medium text-gray-900 dark:text-white">
-                                        {adv.name},
-                                      </h3>
-                                      <span className="mb-2  dark:text-white leading-relaxed">
-                                        {adv.state}
-                                      </span>
-                                      <p className="mb-2  dark:text-white leading-relaxed">
-                                        {adv.email}
-                                      </p>
-                                      <span className="mb-2 dark:text-white  leading-relaxed">
-                                        Ratings: {adv.ratings}
-                                      </span>
-                                      <span className="mb-2  dark:text-white leading-relaxed">
-                                        Amount: {adv.amount}
-                                      </span>
+                          {lawyer.length > 0 ? (
+                            lawyer
+                              .filter((lawyer) => lawyer?._id !== idOfLawyer)
+                              .map((lawyer, index) => {
+                                // console.log(lawyer);
+                                return (
+                                  <div
+                                    className="relative p-6 flex-auto"
+                                    key={index}
+                                  >
+                                    <section className="text-gray-600 body-font">
+                                      <div className="container mx-auto flex px-5  md:flex-row flex-col items-center">
+                                        <div className="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-16 md:mb-0 items-center text-center">
+                                          <h3 className="font-semibold text-xl sm:text-2xl mb-2 text-gray-900 dark:text-white">
+                                            {lawyer.FirstName} {lawyer.LastName}
+                                          </h3>
+                                          <span className="leading-relaxed mb-2 text-gray-900 dark:text-white">
+                                            <b>Location: </b> {lawyer.State},
+                                            India
+                                          </span>
+                                          <p className="leading-relaxed mb-2 text-gray-900 dark:text-white">
+                                            <b>Email: </b> {lawyer.Email}
+                                          </p>
+                                          {/* Assuming `ratings` and `amount` are properties of your lawyer object */}
+                                          <span className="leading-relaxed mb-2 text-gray-900 dark:text-white">
+                                            <b>Ratings: </b>{" "}
+                                            {lawyer.ratings || 0}
+                                          </span>
+                                          <span className="leading-relaxed mb-2 text-gray-900 dark:text-white">
+                                            <b>Fee(Overall)*: </b>{" "}
+                                            {lawyer.FeePerCase}&nbsp;INR
+                                          </span>
+                                          <div className="flex justify-center">
+                                            <button
+                                              className="inline-flex py-2 px-6 text-lg text-white bg-amber-500 hover:bg-amber-600 border-0 rounded focus:outline-none"
+                                              onClick={() => {
+                                                handleBookClick(lawyer._id);
+                                                makePayment(
+                                                  lawyer.FeePerCase,
+                                                  clientName
+                                                );
+                                              }}
+                                            >
+                                              Book
+                                            </button>
+                                          </div>
+                                        </div>
 
-                                      <div className="flex justify-center">
-                                        <button
-                                          className="inline-flex text-white bg-amber-500 border-0 py-2 px-6 focus:outline-none hover:bg-amber-600 rounded text-lg"
-                                          onClick={() =>
-                                            makePayment(adv.amount)
-                                          }
-                                        >
-                                          Book
-                                        </button>
+                                        <div className="lg:max-w-lg lg:w-44 md:w-44 w-44 ml-6">
+                                          <img
+                                            className="object-cover object-center rounded"
+                                            alt="hero"
+                                            src={lawyer.Image}
+                                          />
+                                        </div>
                                       </div>
-                                    </div>
-                                    <div className="lg:max-w-lg lg:w-44 md:w-44 w-44 ml-6">
-                                      <img
-                                        className="object-cover object-center rounded"
-                                        alt="hero"
-                                        src={"/img/" + adv.image}
-                                      />
-                                    </div>
+                                    </section>
                                   </div>
-                                </section>
-                              </div>
-                            );
-                          })}
+                                );
+                              })
+                          ) : (
+                            <div className="p-12">
+                              No Lawyers found in this section
+                            </div>
+                          )}
+
                           {/*footer*/}
                           <div className="flex practices-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
                             <button
@@ -232,6 +341,48 @@ export default function PracticeOverview() {
                               Close
                             </button>
                           </div>
+                          <Dialog
+                            open={dialogOpen}
+                            size="xs"
+                            onClose={() => setDialogOpen(false)}
+                          >
+                            <DialogHeader className="text-lg">
+                              Give a description
+                            </DialogHeader>
+                            <DialogBody>
+                              <div className="dark:bg-gray-500 dark:text-white p-5">
+                                <h2 className="text-md font-semibold mb-4">
+                                  Submit Case
+                                </h2>
+                                <textarea
+                                  rows="4"
+                                  cols="50"
+                                  value={caseDescription}
+                                  onChange={(e) =>
+                                    setCaseDescription(e.target.value)
+                                  }
+                                  placeholder="Enter case description"
+                                ></textarea>
+                              </div>
+                            </DialogBody>
+                            <DialogFooter>
+                              <Button
+                                variant="text"
+                                color="red"
+                                onClick={() => setDialogOpen(false)}
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                // variant="gradient"
+                                // color="green"
+                                className="text-blue-200 bg-[#2d31aca7] hover:bg-[#2d31acdd]"
+                                onClick={handleSubmit}
+                              >
+                                Confirm
+                              </Button>
+                            </DialogFooter>
+                          </Dialog>
                         </div>
                       </div>
                     </div>

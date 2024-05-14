@@ -7,7 +7,7 @@ export default function TopLawyers() {
 
   let getTopLawyersData = async () => {
     try {
-      let URL = "https://find-your-lawyer-server.vercel.app/api/topLawyers";
+      let URL = "http://localhost:5000/api/topLawyers";
       let response = await axios.get(URL);
       let { status, TopLawyers } = response.data;
       if (status) {
@@ -28,18 +28,20 @@ export default function TopLawyers() {
         <div className="container px-4 py-24 mx-auto">
           <div className="flex flex-wrap w-full mb-20">
             <div className="lg:w-1/2 w-full mb-6 lg:mb-0">
-              <h1 className=" text-3xl lg:text-5xl font-bold underline title-font mb-2 text-amber-600 Crimson ">
+              <h1 className=" text-3xl lg:text-5xl font-bold underline title-font mb-2 text-[#e7aa40] Crimson ">
                 Our Top Lawyers
-                <i class="bx bxs-to-top d-flex align-middle"></i>
+                <i className="bx bxs-to-top d-flex align-middle"></i>
               </h1>
             </div>
             <p className="lg:w-1/2 w-full text-slate-700 leading-relaxed dark:text-white Crimson">
-              In India, the legal profession is not only known for attractive
-              packages but it is known for legal reformations for the people of
-              India. Whether making amendments for fast-track court trials for
-              special cases, fighting for the rights of minority communities,
-              or, crucial discussions in the passing of bills and acts, the
-              contributions cannot be overlooked
+              In India, being a lawyer isn't just about impressive paychecks;
+              it's about being a catalyst for positive change in the lives of
+              the people. Whether pushing for speedy trials in special cases,
+              standing up for the rights of minority communities, or actively
+              participating in the discussions that shape our laws, the impact
+              of legal professionals goes beyond the courtroom. Their efforts
+              are like threads weaving through the fabric of our society,
+              working towards a fairer and more just India.
             </p>
           </div>
           <div className="flex flex-wrap -m-4 ">

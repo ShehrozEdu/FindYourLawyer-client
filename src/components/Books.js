@@ -6,7 +6,7 @@ export default function Books() {
   let [boooks, setBoooks] = useState([]);
 
   let BooksData = async () => {
-    let URL = "https://find-your-lawyer-server.vercel.app/api/books";
+    let URL = "http://localhost:5000/api/books";
     let response = await axios.get(URL);
     let { status, books } = response.data;
 

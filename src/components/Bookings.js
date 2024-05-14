@@ -9,7 +9,7 @@ export default function Bookings() {
   let [isLoading, setIsLoading] = useState(true);
 
   let BookingsData = async () => {
-    let URL = "https://find-your-lawyer-server.vercel.app/api/practices";
+    let URL = "http://localhost:5000/api/practices";
     let response = await axios.get(URL);
     let { status, Practice } = response.data;
     // console.log(response.data);
@@ -34,7 +34,7 @@ export default function Bookings() {
       <section className="text-gray-600 body-font dark:bg-gray-800">
         <div className="container px-5 py-10 mx-auto">
           <div className="flex flex-col text-center w-full mb-20">
-            <h1 className="sm:text-4xl text-3xl font-bold title-font mb-4 text-amber-600 underline Crimson">
+            <h1 className="sm:text-4xl text-3xl font-bold title-font mb-4 text-[#e7aa40] underline Crimson">
               Book according to the need!
             </h1>
             <p className="lg:w-2/3 mx-auto leading-relaxed text-base dark:text-white">

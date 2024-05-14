@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 const getInitialTheme = () => {
   if (typeof window !== "undefined" && window.localStorage) {
@@ -20,6 +20,9 @@ export const ThemeContext = React.createContext();
 
 export const ThemeProvider = ({ initialTheme, children }) => {
   const [theme, setTheme] = React.useState(getInitialTheme);
+  let [userLogin, setUserLogin] = useState(null);
+  let [userLawyerToggle, setUserLawyerToggle] = useState(false);
+  let [showModal, setShowModal] = useState(false);
 
   const rawSetTheme = (rawTheme) => {
     const root = window.document.documentElement;
@@ -40,7 +43,18 @@ export const ThemeProvider = ({ initialTheme, children }) => {
   }, [theme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
+    <ThemeContext.Provider
+      value={{
+        theme,
+        setTheme,
+        userLogin,
+        setUserLogin,
+        setUserLawyerToggle,
+        userLawyerToggle,
+        setShowModal,
+        showModal,
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );

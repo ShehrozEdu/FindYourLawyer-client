@@ -7,7 +7,7 @@ export default function NewsFeed() {
 
   let getNewsData = async () => {
     try {
-      let URL = "https://find-your-lawyer-server.vercel.app/api/news";
+      let URL = "http://localhost:5000/api/news";
       let response = await axios.get(URL);
       let { status, News } = response.data;
       if (status) {
@@ -25,10 +25,10 @@ export default function NewsFeed() {
   return (
     <>
       <section className="text-gray-600 body-font color2 ">
-        <div class="container px-5 py-17 mx-auto">
+        <div className="container px-5 py-17 mx-auto">
           <div className="flex flex-col text-center w-full mb-20">
             <h1 className="text-3xl lg:text-5xl font-bold title-font mb-4  text-slate-600 underline  Crimson">
-              <i class="bx bx-news d-flex align-middle mr-3 "></i>Latest News
+              <i className="bx bx-news d-flex align-middle mr-3 "></i>Latest News
             </h1>
             <p className="lg:w-2/3 mx-auto leading-relaxed text-base ">
               Grab the top trending Legal News

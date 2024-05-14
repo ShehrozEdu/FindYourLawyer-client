@@ -10,7 +10,7 @@ export default function BookingsBox({ book }) {
 
   return (
     <>
-      <div className="lg:w-1/3 sm:w-1/2 p-4 r shadow  ">
+      <div className="xl:w-1/3 lg:w-1/3 sm:w-1/2 p-10  shadow  ">
         <div
           className="flex relative cursor-pointer justify-center"
           onClick={() => getPracticeOverview(book._id)}
@@ -23,12 +23,15 @@ export default function BookingsBox({ book }) {
 
           <div className="px-8 py-10 relative z-10 w-full border-4 border-gray-200 bg-white opacity-0 hover:opacity-100">
             <h2 className="tracking-widest text-sm title-font font-medium text-indigo-500 mb-1">
-              {book.subtitle}
+              Hire the best Lawyers in {book.title} section!
             </h2>
-            <h1 className="title-font text-lg font-medium text-gray-900  mb-3">
+            <h1 className="text-2xl font-extrabold text-gradient bg-gradient-to-r from-amber-600 to-red-500 bg-clip-text text-transparent mb-6">
               {book.title}
             </h1>
-            <p className="leading-relaxed">{book.description}</p>
+
+            <p className="leading-relaxed">
+              {book.description.slice(0, 100) + "..."}
+            </p>
           </div>
         </div>
       </div>

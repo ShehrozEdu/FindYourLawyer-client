@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 export default function ServiceBox() {
   return (
     <>
-      <div className="container flex px-5 py-10 md:flex-row flex-col items-center bg-slate-200 dark:bg-gray-700">
+      <div className="container rounded-lg shadow-md flex px-5 py-10 md:flex-row flex-col items-center bg-slate-200 dark:bg-gray-700">
         <div className="lg:max-w-lg lg:w-full md:w-1/3 w-5/4 lg:mr-16 mr-4">
           <img
             className="object-cover object-center rounded mb-2"
@@ -13,27 +13,35 @@ export default function ServiceBox() {
         </div>
         <div className="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-5 md:mb-2 items-center text-center">
           <Link to="/services/ipc&crpcs">
-            <h1 className="title-font sm:text-3xl text-4xl mb-4 font-bold text-rose-900 hex cursor-pointer ">
+            <h1 className="title-font sm:text-3xl text-4xl mb-4 font-bold text-amber-600 hover:text-amber-900 cursor-pointer ">
               IPC and CRPC
             </h1>
           </Link>
-          <p className="mb-8 text-stone-600 text-2xl leading-relaxed Crimson dark:text-white">
-            Read about the latest updates in the legal field and downloadable
-            IPC and CRPC
+          <p className="mb-8 text-stone-600 text-xl leading-relaxed Crimson dark:text-white">
+            Stay informed about the latest legal updates on our platform. Access
+            downloadable materials on IPC and CRPC, essential for understanding
+            the Indian legal system. Explore diverse law-related topics and read
+            blogs by experienced professionals. Whether you're a student or a
+            legal practitioner, our platform offers valuable resources to
+            enhance your understanding and stay updated with the dynamic world
+            of law.
           </p>
         </div>
       </div>
 
-      <div className="container flex px-5 py-10 md:flex-row flex-col items-center mt-3 bg-slate-200 dark:bg-gray-700">
+      <div className="container rounded-lg shadow-md flex px-5 py-10 md:flex-row flex-col items-center mt-3 bg-slate-200 dark:bg-gray-700">
         <div className="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-8 md:mb-2 items-center text-center">
           <Link to="/blogs">
-            <h1 className="title-font sm:text-3xl text-4xl mb-4 font-bold text-rose-900 hex cursor-pointer">
+            <h1 className="title-font sm:text-3xl text-4xl mb-4 font-bold  cursor-pointer text-amber-600 hover:text-amber-900">
               BLOGS
             </h1>
           </Link>
-          <p className="mb-8 text-stone-600 text-2xl leading-relaxed Crimson dark:text-white">
-            Read the blogs by our working Professionals dedicated specifically
-            to recent updates
+          <p className="mb-8 text-stone-600 text-xl leading-relaxed Crimson dark:text-white">
+            Explore insightful blogs authored by our dedicated working
+            professionals, providing in-depth analysis and commentary on recent
+            legal updates. Stay informed about the latest developments in the
+            legal field through their expertise and experience, available
+            exclusively on our platform.
           </p>
         </div>
         <div className="lg:max-w-lg lg:w-full md:w-1/3 w-5/4 lg:mr-16 mr-4">
@@ -45,7 +53,7 @@ export default function ServiceBox() {
         </div>
       </div>
 
-      <div className="container flex px-4 py-8 md:flex-row flex-col items-center mt-3 bg-slate-200 dark:bg-gray-700">
+      <div className="container rounded-lg shadow-md flex px-4 py-8 md:flex-row flex-col items-center mt-3 bg-slate-200 dark:bg-gray-700">
         <div className="lg:max-w-lg lg:w-full md:w-1/3 w-5/4 lg:mr-16 mr-4">
           <img
             className="object-cover object-center rounded mb-2"
@@ -55,13 +63,12 @@ export default function ServiceBox() {
         </div>
         <div className="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-8 md:mb-2 items-center text-center">
           <Link to="/books">
-            <h1 className="title-font sm:text-3xl text-4xl mb-4 font-bold text-rose-900 hex cursor-pointer">
+            <h1 className="title-font sm:text-3xl text-4xl mb-4 font-bold text-amber-600 hover:text-amber-900 cursor-pointer">
               STUDENTS CORNER
             </h1>
           </Link>
-          <p className="mb-8 text-stone-600 text-2xl leading-relaxed Crimson dark:text-white">
-            Get access to the free knowledge and keep yourself updated with
-            current happenings!
+          <p className="mb-8 text-stone-600 text-xl leading-relaxed Crimson dark:text-white">
+          Access valuable knowledge for free and keep yourself updated with the latest happenings in the legal realm! Stay informed about recent developments and trends through our platform, ensuring you're equipped with the most current information in the legal field.
           </p>
         </div>
       </div>
@@ -82,7 +89,7 @@ export default function ServiceBox() {
               </h1>
               <p className="leading-relaxed">{service.description}</p>
             </div>
-          </div>{" "}
+          </div> 
         </Link>
       </div> */}
     </>

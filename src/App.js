@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
-import { SkeletonTheme } from "react-loading-skeleton";
 //Screens
 import HomeScreen from "./components/Home/HomeScreen";
 import Bookings from "./components/Bookings";
@@ -14,32 +13,36 @@ import PracticeOverview from "./components/Lawyers/PracticeOverview";
 import ProtectedRoutes from "./components/utils/PrivateRoutes";
 import LoginPage from "./components/LoginPage";
 import Blog from "./components/BlogCRUD/Article/Blog";
+import Signup from "./components/Signup";
+import Dashboard from "./components/Dashboard/Dashboard";
+import GeminiAi from "./components/GeminiAI/GeminiAi";
 
 function App() {
   return (
     <Router>
       <>
-        <SkeletonTheme baseColor="#c9c9c9" highlightColor="#444">
-          <Navbar />
-          <Routes>
-            <Route path={"/"} element={<HomeScreen />} />
-            <Route path={"/login"} element={<LoginPage />} />
-            <Route path={"/bookings"} element={<Bookings />} />
-            <Route path={"/books"} element={<Books />} />
-            <Route path={"/services/ipc&crpcs"} element={<IPC />} />
-            <Route path={"/lawyersList"} element={<LawyersList />} />
-            <Route path={"/blogs"} element={<Blog />} />
-            <Route path={"/article/:name"} element={<Article />} />
-            <Route element={<ProtectedRoutes />}>
-              <Route
-                path={"/lawyerListOverview/:id"}
-                element={<PracticeOverview />}
-              />
-            </Route>
+        <Navbar />
+        <Routes>
+          <Route path={"/"} element={<HomeScreen />} />
+          <Route path={"/login"} element={<LoginPage />} />
+          <Route path={"/signup"} element={<Signup />} />
+          <Route path={"/bookings"} element={<Bookings />} />
+          <Route path={"/books"} element={<Books />} />
+          <Route path={"/services/ipc&crpcs"} element={<IPC />} />
+          <Route path={"/blogs"} element={<Blog />} />
+          <Route path={"/blog/:id"} element={<Article />} />
+          <Route path={"/lawyersList"} element={<LawyersList />} />
+          <Route path={"/lawyer-dashboard"} element={<Dashboard />} />
+          {/* <Route element={<ProtectedRoutes />}> */}
+          <Route
+            path={"/lawyerListOverview/:id"}
+            element={<PracticeOverview />}
+          />
+          {/* </Route> */}
 
-            <Route path={"*"} element={<Error />} />
-          </Routes>
-        </SkeletonTheme>
+          <Route path={"*"} element={<Error />} />
+          <Route path={"/gemini"} element={<GeminiAi />} />
+        </Routes>
       </>
     </Router>
   );

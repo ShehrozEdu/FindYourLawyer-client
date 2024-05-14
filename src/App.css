@@ -2,7 +2,9 @@
 @tailwind components;
 @import url("https://fonts.googleapis.com/css2?family=Fjalla+One&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600;700&display=swap");
-@import url("https://fonts.cdnfonts.com/css/buffalo");
+html, body {
+  @apply scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-700;
+}
 body {
   margin: 0;
   padding: 0;
@@ -95,7 +97,7 @@ body {
 }
 
 .heightOverview {
-  height: 45vh !important;
+  height: 50vh !important;
 }
 /* .textP {
   font-size: 3rem;
@@ -111,4 +113,22 @@ body {
     /* font-family: "Inter", sans-serif; */
     font-size: 20px;
   }
+}
+
+.gradient-button {
+  background-image: linear-gradient(to right, #e8c32e, #cf531e); /* Adjust colors as needed */
+  color: white; /* Text color */
+  /* Add other styles such as padding, border-radius, etc. */
+}
+
+
+.swal2-container {
+  z-index: 10000000 !important;
+}
+
+.bg-btn-approve{
+  background-color: #61e455;
+}
+.bg-btn-reject{
+  background-color: #f64848;
 }

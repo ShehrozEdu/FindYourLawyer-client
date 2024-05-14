@@ -1,23 +1,50 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import jwt_decode from "jwt-decode";
-import Swal from "sweetalert2";
+import axios from "axios";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { GoogleLogin } from "@react-oauth/google";
+import Swal from "sweetalert2";
+import { ThemeContext } from "../../../components/darkMode/ThemeContext";
+import {
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  Typography,
+  Input,
+  Checkbox,
+  Button,
+  Popover,
+  PopoverHandler,
+  PopoverContent,
+} from "@material-tailwind/react";
 
 export default function NewUSerNavBar() {
+  const { setUserLogin, showModal, setShowModal, userLogin, setUserLawyerToggle, userLawyerToggle } =
+    useContext(ThemeContext);
   const [navbar, setNavbar] = useState(false);
-  let [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState({
+    Email: "",
+    Password: "",
+  });
+  const [errors, setErrors] = useState({
+    Email: "",
+    Password: "",
+  });
+
   let navigate = useNavigate();
+  const location = useLocation();
+  let userDataLocal;
+  const [localNameDetails, setLocalNameDetails] = useState("");
   const navigateToSignup = () => {
     setShowModal(false);
     navigate("/signup");
   };
-  const navigateToHome= ()=>{
-  navigate("/")
-  }
+  const navigateToHome = () => {
+    navigate("/");
+  };
 
-  let [userLogin, setUserLogin] = useState(null);
   let onSuccess = (response) => {
     localStorage.setItem("auth_token2", response.credential); //can be like token= response.cred..
     Swal.fire({
@@ -34,8 +61,9 @@ export default function NewUSerNavBar() {
   };
 
   let logout = () => {
-    localStorage.removeItem("auth_token2");
-    window.location.reload();
+    localStorage.removeItem("auth_token2") ||
+      localStorage.removeItem("auth_token1");
+    window.location.href = "/";
   };
   useEffect(() => {
     let token = localStorage.getItem("auth_token2");
@@ -47,51 +75,213 @@ export default function NewUSerNavBar() {
     }
   }, []);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+    // Validate fields
+    if (name === "Email") {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        Email: !value ? "Email is required" : "",
+      }));
+    } else if (name === "Password") {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        Password: !value ? "Password is required" : "",
+      }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) {
+      return;
+    }
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/users/login",
+        formData,
+        { withCredentials: true }
+      );
+
+      localStorage.setItem("auth_token1", JSON.stringify(response.data.result));
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Login Successful!",
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => window.location.reload());
+    } catch (error) {
+      console.error("Error:", error.message);
+      Swal.fire({
+        position: "center",
+        icon: "error",
+        title: "Login Failed",
+        text: error.response && error.response.data ? error.response.data.message : "Invalid credentials, please try again",
+        showConfirmButton: true,
+      });
+    }
+  };
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const objUser = localStorage.getItem("auth_token1");
+      if (objUser) {
+        userDataLocal = JSON.parse(objUser);
+        setLocalNameDetails(userDataLocal.FirstName);
+        setUserLawyerToggle(userDataLocal.isLawyer ? true : false);
+        let actualToken = userDataLocal.token;
+        try {
+          const decoded = jwt_decode(actualToken);
+          setUserLogin(decoded);
+        } catch (error) {
+          console.error("Error decoding objUser:", error.message);
+          setUserLogin(null);
+        }
+      } else {
+        setUserLogin(null);
+      }
+    };
+
+    fetchData();
+  }, []);
+  const validateForm = () => {
+    let valid = true;
+    const newErrors = { ...errors };
+
+    // Validate Email
+    if (!formData.Email) {
+      newErrors.Email = "Email is required";
+      valid = false;
+    } else if (
+      !formData.Email.includes("@") ||
+      !formData.Email.includes(".com")
+    ) {
+      newErrors.Email = "Email should include @ and .com";
+      valid = false;
+    }
+
+    // Validate Password
+    if (!formData.Password) {
+      newErrors.Password = "Password is required";
+      valid = false;
+    } else if (formData.Password.length < 8) {
+      newErrors.Password = "Password must be at least 8 characters long";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
+
   return (
     <>
       {showModal ? (
         <>
-          <div className="justify-center practices-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-slate-300 dark:bg-gray-600">
+          <div className="justify-center practices-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-slate-300 dark:bg-gray-600 py-16">
             <div className="relative w-auto my-6 mx-auto max-w-3xl ">
               {/*content*/}
               <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none dark:bg-gray-700">
-                {/* -------------------- */}
-                {/*header*/}
-                {/* ------------------------------------- */}
-                <div className="flex practices-start justify-between p-5 border-b border-solid border-slate-200 rounded-t">
-                  <h1
-                    className="text-center text-4xl text-amber-600 font-display font-semibold  xl:text-5xl
-                    xl:text-bold underline Crimson "
-                  >
-                    Sign in
-                  </h1>
-                </div>
                 {/*MODAL body*/}
-                <>
-                  <GoogleOAuthProvider clientId="263148022359-f2gtatcn7s3afukeqjf877ooee8rmgjg.apps.googleusercontent.com">
-                    <div className="lg:flex dark:bg-gray-800">
-                      <div className="lg:w-full xl:max-w-screen-sm">
-                        <div className="py-12 bg-indigo-100 lg:bg-white flex justify-center lg:justify-start lg:px-12 dark:bg-gray-800"></div>
-                        <div className="mt-2 px-12 sm:px-24 md:px-48 lg:px-12 lg:mt-1 xl:px-24 xl:max-w-2xl my-16 ">
-                          <div className="flex flex-col items-center mt-2 lg:mb-0 mb-18">
-                            <p className="Crimson text-2xl text-amber-600 mb-3">
-                              Login With Google
-                            </p>
-                            <GoogleLogin
-                              shape={"circle"}                              
-                              onSuccess={(credentialResponse) => {
-                                onSuccess(credentialResponse);
-                              }}
-                              onError={() => {
-                                onError();
-                              }}
-                            />
+
+                <div>
+                  <div>
+                    <Card className="w-96 shadow-none">
+                      <form onSubmit={handleSubmit}>
+                        <CardHeader
+                          variant="gradient"
+                          color="amber"
+                          className="mb-4 grid h-28 place-items-center"
+                        >
+                          <Typography variant="h3" color="white">
+                            Sign In
+                          </Typography>
+                        </CardHeader>
+                        <CardBody className="flex flex-col gap-4">
+                          <Input
+                            label="Email"
+                            size="lg"
+                            name="Email"
+                            value={formData.Email}
+                            onChange={handleChange}
+                          />
+                          <Typography color="red" variant="small">
+                            {errors.Email}
+                          </Typography>
+                          <Input
+                            label="Password"
+                            size="lg"
+                            type="password"
+                            name="Password"
+                            value={formData.Password}
+                            onChange={handleChange}
+                          />
+                          <Typography color="red" variant="small">
+                            {errors.Password}
+                          </Typography>
+                        </CardBody>
+                        <CardFooter className="pt-0">
+                          <Button
+                            type="submit"
+                            variant="gradient"
+                            className="text-white"
+                            fullWidth
+                          >
+                            Sign In
+                          </Button>
+                          <Typography
+                            variant="small"
+                            className="mt-6 flex justify-center"
+                          >
+                            Don&apos;t have an account?
+                            <Typography
+                              as="a"
+                              variant="small"
+                              color="blue-gray"
+                              className="ml-1 font-bold cursor-pointer"
+                              onClick={navigateToSignup}
+                            >
+                              Sign up
+                            </Typography>
+                          </Typography>
+                        </CardFooter>
+                      </form>
+                    </Card>
+                  </div>
+                  <div>
+                    <GoogleOAuthProvider
+                      clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
+                    >
+                      <div className="lg:flex dark:bg-gray-800">
+                        <div className="lg:w-full xl:max-w-screen-sm">
+                          <div className="py-1 bg-amber-400 flex justify-center lg:justify-start lg:px-12 dark:bg-gray-800"></div>
+                          <div className="px-12 sm:px-24 md:px-48 lg:px-12 lg:mt-1 xl:px-24 xl:max-w-2xl my-16 ">
+                            <div className="flex flex-col items-center  lg:mb-0 mb-18">
+                              <p className="text-xl text-[#e7aa40] mb-3">or</p>
+
+                              <GoogleLogin
+                                shape={"circle"}
+                                onSuccess={(credentialResponse) => {
+                                  onSuccess(credentialResponse);
+                                }}
+                                onError={() => {
+                                  onError();
+                                }}
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </GoogleOAuthProvider>
-                </>
+                    </GoogleOAuthProvider>
+                  </div>
+                </div>
+
                 {/*footer*/}
                 <div className="flex practices-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
                   <button
@@ -109,12 +299,16 @@ export default function NewUSerNavBar() {
         </>
       ) : null}
       <nav className="w-full bg-white dark:bg-gray-900 shadow">
-        <div className="justify-between px-4 mx-auto lg:max-w-7xl md:items-center md:flex md:px-8">
+        <div className="justify-between xl:mr-8 lg:mr-8 md:mr-8 md:items-center md:flex md:px-8">
           <div>
-           
-            <div className="flex items-center justify-between py-3 md:py-5">     
-                <img src="/img/logo.png" className="logo cursor-pointer mr-0" alt="" onClick={navigateToHome} />
-                <h2 className="ml-3 text-xl fw-bolder text-black dark:text-white">
+            <div className="flex items-center justify-between py-3 md:py-5">
+              <img
+                src="/img/logo.png"
+                className="logo cursor-pointer mr-0"
+                alt=""
+                onClick={navigateToHome}
+              />
+              <h2 className="ml-3 text-xl fw-bolder text-black dark:text-white">
                 FindYourLawyer
               </h2>
               <div className="md:hidden">
@@ -155,51 +349,69 @@ export default function NewUSerNavBar() {
               </div>
             </div>
           </div>
-      
+
           <div>
-            {userLogin === null ? (
-              <div
-                className={`flex-1 justify-self-center pb-3 mt-8 md:block md:pb-0 md:mt-0 ${
-                  navbar ? "block" : "hidden"
+            <div
+              className={`flex-1 justify-self-center pb-3 mt-8 md:block md:pb-0 md:mt-0 ${navbar ? "block" : "hidden"
                 }`}
-              >
-                <ul className="items-center justify-center space-y-8 md:flex md:space-x-6 md:space-y-0">
-                  <li className="text-gray-700 dark:text-white  font-bold hover:text-amber-600 dark:hover:text-yellow-300 ">
-                    <Link to="/">Home</Link>
-                  </li>
-                  <li className="text-gray-700 dark:text-white font-medium hover:text-amber-600 dark:hover:text-yellow-300 ">
-                    <Link to="/bookings">Lawyer Booking</Link>
-                  </li>
+            >
+              <ul className="items-center justify-center space-y-8 md:flex md:space-x-6 md:space-y-0">
+                <li
+                  className={`text-gray-700 dark:text-white ${location.pathname === "/" ? "font-bold" : "font-medium"
+                    } hover:text-[#e7aa40] dark:hover:text-yellow-300`}
+                >
+                  <Link to="/">Home</Link>
+                </li>
+                <li
+                  className={`text-gray-700 dark:text-white ${location.pathname === "/bookings" ? "font-bold" : "font-medium"
+                    } hover:text-[#e7aa40] dark:hover:text-yellow-300`}
+                >
+                  <Link to="/bookings">Lawyer Booking</Link>
+                </li>
+                {userLogin === null ? (
                   <li
-                    className="text-gray-700 dark:text-white font-medium hover:text-amber-600 dark:hover:text-yellow-300 cursor-pointer "
+                    className="text-gray-700 dark:text-white font-medium hover:text-[#e7aa40] dark:hover:text-yellow-300 cursor-pointer"
                     onClick={() => setShowModal(true)}
                   >
                     Sign In
                   </li>
-                </ul>
-              </div>
-            ) : (
-              <div
-                className={`flex-1 justify-self-center pb-3 mt-8 md:block md:pb-0 md:mt-0 ${
-                  navbar ? "block" : "hidden"
-                }`}
-              >
-                <ul className="items-center justify-center space-y-8 md:flex md:space-x-6 md:space-y-0">
-                  <li className="text-gray-700 dark:text-white  font-bold hover:text-amber-600 dark:hover:text-yellow-300 ">
-                    <Link to="/">Home</Link>
-                  </li>
-                  <li className="text-gray-700 dark:text-white font-medium hover:text-amber-600 dark:hover:text-yellow-300 ">
-                    <Link to="/bookings">Lawyer Booking</Link>
-                  </li>
-                  <li
-                    className="text-gray-700 dark:text-white font-medium hover:text-amber-600 dark:hover:text-yellow-300 cursor-pointer "
-                    onClick={logout}
-                  >
-                    Logout
-                  </li>
-                </ul>
-              </div>
-            )}
+                ) : (
+                  <>
+                    <li
+                      className={`text-gray-700 dark:text-white ${location.pathname === "/gemini" ? "font-bold" : "font-medium"
+                        } hover:text-[#e7aa40] dark:hover:text-yellow-300`}
+                    >
+                      <Link to="/gemini">Try AI Chat</Link>
+                    </li>
+                    <li>
+                      <Popover placement="bottom" className="dark:bg-black">
+                        <PopoverHandler>
+                          <span className="text-gray-700  dark:text-white font-medium hover:text-[#e7aa40] dark:hover:text-yellow-300 cursor-pointer ">
+                            {localNameDetails}
+                          </span>
+                        </PopoverHandler>
+                        <PopoverContent>
+                          {userLawyerToggle && (
+                            <Link to={"/lawyer-dashboard"}>
+                              <div className="text-gray-700 dark:text-black font-medium hover:text-[#e7aa40] dark:hover:text-yellow-300 cursor-pointer">
+                                Dashboard
+                              </div>
+                            </Link>
+                          )}
+                          <p
+                            className="text-gray-700 dark:text-black font-medium hover:text-[#e7aa40] dark:hover:text-yellow-300 cursor-pointer "
+                            onClick={logout}
+                          >
+                            Logout
+                          </p>
+                        </PopoverContent>
+                      </Popover>
+                    </li>
+                  </>
+                )}
+              </ul>
+            </div>
+
           </div>
         </div>
       </nav>

@@ -14,19 +14,19 @@ export default function BgImg() {
               <div className="sm:flex sm:items-start border shadow">
                 <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-center Crimson p-8">
                   <h3
-                    className=" lg:text-5xl md:text-2xl sm:text-2xl textP leading-6 font-bold text-white mt-2 text-3xl "
-                    id="modal-title "
+                    className="lg:text-5xl md:text-2xl sm:text-2xl textP leading-6 font-bold text-white mt-2 text-3xl"
+                    id="modal-title"
                   >
-                    "Get the best &nbsp;
-                    <span className="text-amber-600">consultation</span> advice
-                    for your <span className="text-amber-600"> problems"</span>
+                    Receive top-notch&nbsp;
+                    <span className="text-[#e7aa40]">consultation</span> to
+                    address your concerns at an affordable rate!
                   </h3>
                   <div className="mt-2 mb-4">
                     <p className="leading-relaxed p-0 font-medium text-2xl text-white textP">
-                      <br /> at just a minimal &nbsp;
-                      <span className="text-amber-600">cost! </span>
-                      <br /> We provide the best solutions to your &nbsp;
-                      <span className="text-amber-600">legal issues.</span>
+                      <br /> At just a minimal &nbsp;
+                      <span className="text-[#e7aa40]">cost!</span> <br /> We
+                      offer optimal solutions for your&nbsp;
+                      <span className="text-[#e7aa40]">legal issues.</span>
                     </p>
                   </div>
                 </div>
