@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 import LawyersListBox from "./LawyerListBox";
+import axiosInstance from "../Auth/AxiosInstance";
 
 export default function LawyersList() {
   const [lawyersList, setLawyersList] = useState([]);
@@ -11,9 +12,8 @@ export default function LawyersList() {
 
   useEffect(() => {
     const getLawyerData = async () => {
-      const URL = `http://localhost:5000/api/lawyersListExpertise`;
       try {
-        const response = await axios.get(URL);
+        const response = await axiosInstance.get("/lawyersListExpertise");
         console.log("Response data:", response.data);
         const { status, lawyersByExpertise } = response.data;
         if (status) {

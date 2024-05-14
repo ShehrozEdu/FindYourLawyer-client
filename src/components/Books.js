@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import BooksBox from "./BooksBox";
 import axios from "axios";
+import axiosInstance from "./Auth/AxiosInstance";
 
 export default function Books() {
   let [boooks, setBoooks] = useState([]);
 
   let BooksData = async () => {
-    let URL = "http://localhost:5000/api/books";
-    let response = await axios.get(URL);
+    let response = await axiosInstance.get("/books");
     let { status, books } = response.data;
 
     try {

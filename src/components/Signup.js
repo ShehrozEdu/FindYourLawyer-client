@@ -14,6 +14,7 @@ import {
 } from "@material-tailwind/react";
 import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
+import axiosInstance from "./Auth/AxiosInstance";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -176,8 +177,8 @@ const Signup = () => {
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/users/signup",
+      const response = await axiosInstance.post(
+        "/users/signup",
         formData,
         { withCredentials: true }
       );

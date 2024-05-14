@@ -19,6 +19,7 @@ import {
   PopoverHandler,
   PopoverContent,
 } from "@material-tailwind/react";
+import axiosInstance from "../../../components/Auth/AxiosInstance";
 
 export default function NewUSerNavBar() {
   const { setUserLogin, showModal, setShowModal, userLogin, setUserLawyerToggle, userLawyerToggle } =
@@ -101,8 +102,8 @@ export default function NewUSerNavBar() {
       return;
     }
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/users/login",
+      const response = await axiosInstance.post(
+        "/users/login",
         formData,
         { withCredentials: true }
       );

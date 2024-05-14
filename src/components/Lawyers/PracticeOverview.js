@@ -9,6 +9,7 @@ import {
   DialogBody,
   DialogFooter,
 } from "@material-tailwind/react";
+import axiosInstance from "../Auth/AxiosInstance";
 
 // import ModalPop from "./ModalPop";
 
@@ -53,14 +54,13 @@ export default function PracticeOverview() {
       return false;
     }
 
-    let URL = "http://localhost:5000/api/payment";
     const clientEmail = JSON.parse(localStorage.getItem("auth_token1")).email;
     let sendData = {
       amount: amount,
       email: clientEmail,
     };
 
-    let { data } = await axios.post(URL, sendData);
+    let { data } = await axiosInstance.post("/payment", sendData);
     let { order } = data;
 
     var options = {
@@ -73,24 +73,23 @@ export default function PracticeOverview() {
         "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Balanced_scale_of_Justice.svg/2560px-Balanced_scale_of_Justice.svg.png",
       order_id: order.id,
       handler: async function (response) {
-        let URL = "http://localhost:5000/api/callback";
         let sendData = {
           payment_id: response.razorpay_payment_id,
           order_id: response.razorpay_order_id,
           signature: response.razorpay_signature,
         };
 
-        let { data } = await axios.post(URL, sendData);
+        let { data } = await axiosInstance.post("/callback", sendData);
         if (data.status === true) {
           Swal.fire({
             icon: "success",
-            title: "payment Successful",
+            title: "Payment Successful",
           }).then(() => {
             setDialogOpen(true);
             handleSubmit();
           });
         } else {
-          alert("payment fails, try again.");
+          alert("Payment fails, try again.");
         }
       },
       prefill: {
@@ -108,9 +107,8 @@ export default function PracticeOverview() {
   //--------------------------
 
   let getPracticeID = async () => {
-    let URL = "http://localhost:5000/api/getpracticebyid/" + params.id;
     try {
-      let response = await axios.get(URL);
+      let response = await axiosInstance.get("/getpracticebyid/" + params.id);
 
       let { status, Practice } = response.data;
 
@@ -129,9 +127,10 @@ export default function PracticeOverview() {
     getPracticeID();
   }, []);
   let getLawyerData = async (expertise) => {
-    let URL = `http://localhost:5000/api/lawyersListExpertise?expertise=${expertise}`;
     try {
-      let response = await axios.get(URL);
+      let response = await axiosInstance.get(
+        `/lawyersListExpertise?expertise=${expertise}`
+      );
       let { status, lawyers } = response.data;
       if (status) {
         setLawyer(lawyers);
@@ -180,8 +179,8 @@ export default function PracticeOverview() {
         return;
       }
 
-      const response = await axios.post(
-        "http://localhost:5000/api/case-requests/create",
+      const response = await axiosInstance.post(
+        "/case-requests/create",
         {
           client: clientId,
           lawyerId: selectedLawyerId,
@@ -196,6 +195,9 @@ export default function PracticeOverview() {
       Swal.fire("Case request submitted successfully");
       setCaseDescription("");
       setDialogOpen(false);
+      if(response.status===200){
+        navigate("/");
+      }
     } catch (error) {
       console.error("Error submitting case request:", error);
     }

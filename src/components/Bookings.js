@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import BookingsBox from "./BookingsBox";
 import LoadingSkeleton from "./utils/LoadingSkelton";
+import axiosInstance from "./Auth/AxiosInstance";
 
 export default function Bookings() {
   let [booking, setBooking] = useState([]);
@@ -9,8 +10,7 @@ export default function Bookings() {
   let [isLoading, setIsLoading] = useState(true);
 
   let BookingsData = async () => {
-    let URL = "http://localhost:5000/api/practices";
-    let response = await axios.get(URL);
+    let response = await axiosInstance.get("/practices");
     let { status, Practice } = response.data;
     // console.log(response.data);
 

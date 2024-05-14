@@ -12,6 +12,7 @@ import {
   DialogFooter,
 } from "@material-tailwind/react";
 import Swal from "sweetalert2";
+import axiosInstance from "../../Auth/AxiosInstance";
 
 export default function Blog() {
   const [blogs, setBlogs] = useState([]);
@@ -25,7 +26,7 @@ export default function Blog() {
 
   const fetchBlogs = async () => {
     try {
-      const response = await axios.get("https://find-your-lawyer-server.vercel.app/api/all-blogs");
+      const response = await axiosInstance.get(`/all-blogs`);
       setBlogs(response.data);
     } catch (error) {
       console.error("Error fetching blogs:", error);
@@ -45,8 +46,8 @@ export default function Blog() {
     };
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/blogs/create-blog",
+      const response = await axiosInstance.post(
+        "/blogs/create-blog",
         blogData
       );
       if (response.status === 200) {

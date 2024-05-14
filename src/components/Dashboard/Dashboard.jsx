@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ClientDescription from './ClientDescription';
 import axios from 'axios';
+import axiosInstance from '../Auth/AxiosInstance';
 
 const LawyerDashboard = () => {
   const [clients, setClients] = useState([]);
@@ -10,7 +11,7 @@ const LawyerDashboard = () => {
   useEffect(() => {
     // Fetch data from API
     const lawyerId = JSON.parse(localStorage.getItem("auth_token1"))._id;
-    axios.get(`http://localhost:5000/api/my-cases/${lawyerId}`)
+    axiosInstance.get(`/my-cases/${lawyerId}`)
       .then(response => {
         setClients(response.data.casesLawyers); // Assuming response contains an array of clients
 

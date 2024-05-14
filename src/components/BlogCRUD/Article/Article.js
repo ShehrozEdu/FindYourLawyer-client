@@ -13,6 +13,7 @@ import { BsThreeDots } from "react-icons/bs";
 import ArticleReuse from "./ArticleReuse";
 import Error from "../../Error";
 import Swal from "sweetalert2";
+import axiosInstance from "../../Auth/AxiosInstance";
 
 export default function Article() {
   const [blog, setBlog] = useState(null);
@@ -24,8 +25,8 @@ export default function Article() {
 
   const getBlog = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/all-blogs/${id}`
+      const response = await axiosInstance.get(
+        `/all-blogs/${id}`
       );
       setBlog(response.data.blog);
     } catch (error) {
@@ -38,8 +39,8 @@ export default function Article() {
 
   const updateBlog = async () => {
     try {
-      const response = await axios.put(
-        `http://localhost:5000/api/all-blogs/${id}`,
+      const response = await axiosInstance.put(
+        `/all-blogs/${id}`,
         {
           title,
           content,
@@ -63,8 +64,8 @@ export default function Article() {
   };
   const handleDelete = async (postId) => {
     try {
-      const response = await axios.delete(
-        `http://localhost:5000/api/all-blogs/${postId}`
+      const response = await axiosInstance.delete(
+        `/all-blogs/${postId}`
       );
       console.log(response.data);
       if (response.status === 200) {

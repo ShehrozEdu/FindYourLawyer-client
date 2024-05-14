@@ -1,14 +1,15 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import TopLawyersBox from "./TopLawyersBox";
+import axiosInstance from "../Auth/AxiosInstance";
 
 export default function TopLawyers() {
   let [TopLawyers, setTopLawyer] = useState([]);
 
   let getTopLawyersData = async () => {
     try {
-      let URL = "http://localhost:5000/api/topLawyers";
-      let response = await axios.get(URL);
+  
+      let response = await axiosInstance.get("/topLawyers");
       let { status, TopLawyers } = response.data;
       if (status) {
         setTopLawyer([...TopLawyers]);

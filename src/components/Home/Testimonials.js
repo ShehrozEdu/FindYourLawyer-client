@@ -2,12 +2,12 @@ import React from "react";
 import { useState, useEffect } from "react";
 import TestimonialBox from "./TestimonialBox";
 import axios from "axios";
+import axiosInstance from "../Auth/AxiosInstance";
 export default function Testimonials() {
   let [testimonial, setTestimonial] = useState([]);
 
   let TestimonialData = async () => {
-    let URL = "http://localhost:5000/api/testimonials";
-    let response = await axios.get(URL);
+    let response = await axiosInstance.get("/testimonials");
     let { status, Testimonials } = response.data;
     // console.log(status);
     try {

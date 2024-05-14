@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import NewsBox from "./NewsBox";
+import axiosInstance from "../Auth/AxiosInstance";
 
 export default function NewsFeed() {
   let [news, setNews] = useState([]);
 
   let getNewsData = async () => {
     try {
-      let URL = "http://localhost:5000/api/news";
-      let response = await axios.get(URL);
+      let response = await axiosInstance.get("/news");
       let { status, News } = response.data;
       if (status) {
         setNews([...News]);
