@@ -13,7 +13,6 @@ import {
   CardFooter,
   Typography,
   Input,
-  Checkbox,
   Button,
   Popover,
   PopoverHandler,
@@ -46,17 +45,16 @@ export default function NewUSerNavBar() {
     navigate("/");
   };
 
-  let onSuccess = (response) => {
-    localStorage.setItem("auth_token2", response.credential); //can be like token= response.cred..
+  const onSuccess = (response) => {
+    localStorage.setItem("auth_token2", response.credential);
     Swal.fire({
       position: "center",
       icon: "success",
       title: "Login Successful!",
       showConfirmButton: false,
       timer: 1500,
-    }).then(() => window.location.reload());
+    }).then(() => window.location.href = "/");
   };
-
   let onError = () => {
     alert("Login Failed");
   };
@@ -66,15 +64,7 @@ export default function NewUSerNavBar() {
       localStorage.removeItem("auth_token1");
     window.location.href = "/";
   };
-  useEffect(() => {
-    let token = localStorage.getItem("auth_token2");
-    if (token) {
-      let decoded = jwt_decode(token);
-      setUserLogin(decoded);
-    } else {
-      setUserLogin(null);
-    }
-  }, []);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -115,7 +105,7 @@ export default function NewUSerNavBar() {
         title: "Login Successful!",
         showConfirmButton: false,
         timer: 1500,
-      }).then(() => window.location.reload());
+      }).then(() => window.location.href = "/");
     } catch (error) {
       console.error("Error:", error.message);
       Swal.fire({
@@ -131,17 +121,29 @@ export default function NewUSerNavBar() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const objUser = localStorage.getItem("auth_token1");
-      if (objUser) {
-        userDataLocal = JSON.parse(objUser);
+      const authToken1 = localStorage.getItem("auth_token1");
+      const authToken2 = localStorage.getItem("auth_token2");
+
+      let userDataLocal;
+
+      if (authToken1) {
+        userDataLocal = JSON.parse(authToken1);
         setLocalNameDetails(userDataLocal.FirstName);
         setUserLawyerToggle(userDataLocal.isLawyer ? true : false);
-        let actualToken = userDataLocal.token;
         try {
-          const decoded = jwt_decode(actualToken);
+          const decoded = jwt_decode(userDataLocal.token);
           setUserLogin(decoded);
         } catch (error) {
-          console.error("Error decoding objUser:", error.message);
+          console.error("Error decoding auth_token1:", error.message);
+          setUserLogin(null);
+        }
+      } else if (authToken2) {
+        try {
+          const decoded = jwt_decode(authToken2);
+          setUserLogin(decoded);
+          console.log(decoded);
+        } catch (error) {
+          console.error("Error decoding auth_token2:", error.message);
           setUserLogin(null);
         }
       } else {
@@ -151,6 +153,9 @@ export default function NewUSerNavBar() {
 
     fetchData();
   }, []);
+
+
+
   const validateForm = () => {
     let valid = true;
     const newErrors = { ...errors };
@@ -179,7 +184,7 @@ export default function NewUSerNavBar() {
     setErrors(newErrors);
     return valid;
   };
-
+// console.log(userLogin)
 
   return (
     <>
@@ -388,7 +393,8 @@ export default function NewUSerNavBar() {
                       <Popover placement="bottom" className="dark:bg-black">
                         <PopoverHandler>
                           <span className="text-gray-700  dark:text-white font-medium hover:text-[#e7aa40] dark:hover:text-yellow-300 cursor-pointer ">
-                            {localNameDetails}
+                            {localNameDetails?localNameDetails: userLogin?.name}
+
                           </span>
                         </PopoverHandler>
                         <PopoverContent>

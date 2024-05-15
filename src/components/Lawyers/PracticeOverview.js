@@ -32,7 +32,7 @@ export default function PracticeOverview() {
   };
   //RAZORPAY
   const clientName = JSON.parse(localStorage.getItem("auth_token1"))?.FirstName;
-  const clientEmail = JSON.parse(localStorage.getItem("auth_token1"))?.email;
+
   // Check if user is logged in
   const isLoggedIn = localStorage.getItem("auth_token1") !== null;
 
@@ -54,7 +54,7 @@ export default function PracticeOverview() {
       return false;
     }
 
-    const clientEmail = JSON.parse(localStorage.getItem("auth_token1")).email;
+    const clientEmail = JSON.parse(localStorage.getItem("auth_token1")).Email;
     let sendData = {
       amount: amount,
       email: clientEmail,
@@ -62,6 +62,7 @@ export default function PracticeOverview() {
 
     let { data } = await axiosInstance.post("/payment", sendData);
     let { order } = data;
+    // console.log("data sent: ", sendData);
 
     var options = {
       key: "rzp_test_Gaer6wsOr2pz3k",
@@ -86,7 +87,7 @@ export default function PracticeOverview() {
             title: "Payment Successful",
           }).then(() => {
             setDialogOpen(true);
-            handleSubmit();
+           
           });
         } else {
           alert("Payment fails, try again.");
@@ -98,6 +99,8 @@ export default function PracticeOverview() {
         contact: "9876543215",
       },
     };
+    // console.log("order", order);
+    // console.log("order.amount", order.amount);
     var paymentObject = new window.Razorpay(options);
     paymentObject.open();
   };
@@ -159,12 +162,19 @@ export default function PracticeOverview() {
 
   const handleSubmit = async () => {
     try {
+      // Check if the user is logged in
       if (!isLoggedIn) {
-        // Handle unauthenticated user
+        Swal.fire({
+          text: "You need to be logged in to submit a case request.",
+        });
         return;
       }
-      const clientId = JSON.parse(localStorage.getItem("auth_token1"))._id;
 
+      // Get client ID from local storage
+      const clientData = localStorage.getItem("auth_token1");
+      const clientId = clientData ? JSON.parse(clientData)._id : null;
+
+      // Validate that a lawyer is selected
       if (!selectedLawyerId) {
         Swal.fire({
           text: "No lawyer selected",
@@ -172,6 +182,7 @@ export default function PracticeOverview() {
         return;
       }
 
+      // Validate that the case description is provided
       if (!caseDescription) {
         Swal.fire({
           text: "Case description cannot be empty",
@@ -179,29 +190,43 @@ export default function PracticeOverview() {
         return;
       }
 
+      // Log all variables to debug
+      // console.log("Client ID:", clientId);
+      // console.log("Selected Lawyer ID:", selectedLawyerId);
+      // console.log("Case Description:", caseDescription);
+      // console.log("Client Name:", clientName);
+
+      // Create a payload object
+      const payload = {
+        client: clientId,
+        lawyerId: selectedLawyerId,
+        description: caseDescription,
+        clientName: clientName,
+      };
+
+      // Make the API call to submit the case request
       const response = await axiosInstance.post(
         "/case-requests/create",
-        {
-          client: clientId,
-          lawyerId: selectedLawyerId,
-          description: caseDescription,
-          // income:lawyer.FeePerCase,
-          clientName: clientName,
-        }
+        payload
       );
-      console.log(response);
 
+      // Handle successful submission
       console.log("Case request submitted successfully");
       Swal.fire("Case request submitted successfully");
       setCaseDescription("");
       setDialogOpen(false);
-      if(response.status===200){
+      if (response.status === 201) {
         navigate("/");
       }
     } catch (error) {
+      // Handle errors during the submission process
       console.error("Error submitting case request:", error);
+      Swal.fire({
+        text: "An error occurred while submitting the case request.",
+      });
     }
   };
+
   const idOfLawyer = JSON.parse(localStorage?.getItem("auth_token1"))?._id;
   return (
     <>
@@ -268,65 +293,71 @@ export default function PracticeOverview() {
                           </div>
                           {/*MODAL body*/}
                           {lawyer.length > 0 ? (
-                            lawyer
-                              .filter((lawyer) => lawyer?._id !== idOfLawyer)
-                              .map((lawyer, index) => {
-                                // console.log(lawyer);
-                                return (
-                                  <div
-                                    className="relative p-6 flex-auto"
-                                    key={index}
-                                  >
-                                    <section className="text-gray-600 body-font">
-                                      <div className="container mx-auto flex px-5  md:flex-row flex-col items-center">
-                                        <div className="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-16 md:mb-0 items-center text-center">
-                                          <h3 className="font-semibold text-xl sm:text-2xl mb-2 text-gray-900 dark:text-white">
-                                            {lawyer.FirstName} {lawyer.LastName}
-                                          </h3>
-                                          <span className="leading-relaxed mb-2 text-gray-900 dark:text-white">
-                                            <b>Location: </b> {lawyer.State},
-                                            India
-                                          </span>
-                                          <p className="leading-relaxed mb-2 text-gray-900 dark:text-white">
-                                            <b>Email: </b> {lawyer.Email}
-                                          </p>
-                                          {/* Assuming `ratings` and `amount` are properties of your lawyer object */}
-                                          <span className="leading-relaxed mb-2 text-gray-900 dark:text-white">
-                                            <b>Ratings: </b>{" "}
-                                            {lawyer.ratings || 0}
-                                          </span>
-                                          <span className="leading-relaxed mb-2 text-gray-900 dark:text-white">
-                                            <b>Fee(Overall)*: </b>{" "}
-                                            {lawyer.FeePerCase}&nbsp;INR
-                                          </span>
-                                          <div className="flex justify-center">
-                                            <button
-                                              className="inline-flex py-2 px-6 text-lg text-white bg-amber-500 hover:bg-amber-600 border-0 rounded focus:outline-none"
-                                              onClick={() => {
-                                                handleBookClick(lawyer._id);
-                                                makePayment(
-                                                  lawyer.FeePerCase,
-                                                  clientName
-                                                );
-                                              }}
-                                            >
-                                              Book
-                                            </button>
+                            lawyer.filter(
+                              (lawyer) => lawyer?._id !== idOfLawyer
+                            ).length > 0 ? (
+                              lawyer
+                                .filter((lawyer) => lawyer?._id !== idOfLawyer)
+                                .map((lawyer, index) => {
+                                  return (
+                                    <div
+                                      className="relative p-6 flex-auto"
+                                      key={index}
+                                    >
+                                      <section className="text-gray-600 body-font">
+                                        <div className="container mx-auto flex px-5 md:flex-row flex-col items-center">
+                                          <div className="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-16 md:mb-0 items-center text-center">
+                                            <h3 className="font-semibold text-xl sm:text-2xl mb-2 text-gray-900 dark:text-white">
+                                              {lawyer.FirstName}{" "}
+                                              {lawyer.LastName}
+                                            </h3>
+                                            <span className="leading-relaxed mb-2 text-gray-900 dark:text-white">
+                                              <b>Location: </b> {lawyer.State},
+                                              India
+                                            </span>
+                                            <p className="leading-relaxed mb-2 text-gray-900 dark:text-white">
+                                              <b>Email: </b> {lawyer.Email}
+                                            </p>
+                                            <span className="leading-relaxed mb-2 text-gray-900 dark:text-white">
+                                              <b>Ratings: </b>{" "}
+                                              {lawyer.ratings || 0}
+                                            </span>
+                                            <span className="leading-relaxed mb-2 text-gray-900 dark:text-white">
+                                              <b>Fee(Overall)*: </b>{" "}
+                                              {lawyer.FeePerCase} INR
+                                            </span>
+                                            <div className="flex justify-center">
+                                              <button
+                                                className="inline-flex py-2 px-6 text-lg text-white bg-amber-500 hover:bg-amber-600 border-0 rounded focus:outline-none"
+                                                onClick={() => {
+                                                  handleBookClick(lawyer._id);
+                                                  makePayment(
+                                                    lawyer.FeePerCase,
+                                                    clientName
+                                                  );
+                                                }}
+                                              >
+                                                Book
+                                              </button>
+                                            </div>
+                                          </div>
+                                          <div className="lg:max-w-lg lg:w-44 md:w-44 w-44 ml-6">
+                                            <img
+                                              className="object-cover object-center rounded"
+                                              alt="hero"
+                                              src={lawyer.Image}
+                                            />
                                           </div>
                                         </div>
-
-                                        <div className="lg:max-w-lg lg:w-44 md:w-44 w-44 ml-6">
-                                          <img
-                                            className="object-cover object-center rounded"
-                                            alt="hero"
-                                            src={lawyer.Image}
-                                          />
-                                        </div>
-                                      </div>
-                                    </section>
-                                  </div>
-                                );
-                              })
+                                      </section>
+                                    </div>
+                                  );
+                                })
+                            ) : (
+                              <div className="p-12">
+                                No Lawyers found in this section
+                              </div>
+                            )
                           ) : (
                             <div className="p-12">
                               No Lawyers found in this section
@@ -345,7 +376,7 @@ export default function PracticeOverview() {
                           </div>
                           <Dialog
                             open={dialogOpen}
-                            size="xs"
+                            size="sm"
                             onClose={() => setDialogOpen(false)}
                           >
                             <DialogHeader className="text-lg">
@@ -379,7 +410,7 @@ export default function PracticeOverview() {
                                 // variant="gradient"
                                 // color="green"
                                 className="text-blue-200 bg-[#2d31aca7] hover:bg-[#2d31acdd]"
-                                onClick={handleSubmit}
+                                onClick={() => handleSubmit()}
                               >
                                 Confirm
                               </Button>
