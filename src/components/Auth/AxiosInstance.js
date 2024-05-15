@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "https://findyourlawyer.netlify.app/api",
+  baseURL: "https://find-your-lawyer-server.vercel.app/api",
 });
 
 axiosInstance.interceptors.request.use(
