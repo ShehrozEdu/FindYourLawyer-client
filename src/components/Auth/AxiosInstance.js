@@ -1,30 +1,27 @@
 import axios from "axios";
 
-// Create an Axios instance
 const axiosInstance = axios.create({
-  baseURL: "https://find-your-lawyer-server.vercel.app/api/",
+  baseURL: "http://localhost:5000/api/",
 });
 
-// Add a request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
-    // You can modify the config before the request is sent, such as adding headers
+    // console.log("Request config: ", config);
     return config;
   },
   (error) => {
-    // Handle request error here
+    console.error("Request error: ", error);
     return Promise.reject(error);
   }
 );
 
-// Add a response interceptor
 axiosInstance.interceptors.response.use(
   (response) => {
-    // You can modify the response here
+    // console.log("Response: ", response);
     return response;
   },
   (error) => {
-    // Handle response error here
+    console.error("Response error: ", error);
     return Promise.reject(error);
   }
 );

@@ -32,13 +32,15 @@ function App() {
           <Route path={"/blogs"} element={<Blog />} />
           <Route path={"/blog/:id"} element={<Article />} />
           <Route path={"/lawyersList"} element={<LawyersList />} />
-          <Route path={"/lawyer-dashboard"} element={<Dashboard />} />
-          {/* <Route element={<ProtectedRoutes />}> */}
-          <Route
-            path={"/lawyerListOverview/:id"}
-            element={<PracticeOverview />}
-          />
-          {/* </Route> */}
+          <Route element={<ProtectedRoutes />}>
+            <Route path={"/lawyer-dashboard"} element={<Dashboard />} />
+          </Route>
+          <Route element={<ProtectedRoutes />}>
+            <Route
+              path={"/lawyerListOverview/:id"}
+              element={<PracticeOverview />}
+            />
+          </Route>
 
           <Route path={"*"} element={<Error />} />
           <Route path={"/gemini"} element={<GeminiAi />} />
