@@ -44,22 +44,32 @@ const LawyerDashboard = () => {
       </div>
       <div className="mt-8 dark:bg-gray-500 dark:text-white p-5">
         <h2 className="text-2xl font-semibold mb-4">My Cases</h2>
-        <ul>
-          {clients.map((client, idx) => (
-            <li key={idx} className="p-4 bg-white rounded-lg shadow-md mb-4 dark:bg-gray-500 dark:text-white" >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-medium">Clent Name: {client.clientName}</h3>
+        {clients.length > 0 ? (
+          <ul>
+            {clients.map((client, idx) => (
+              <li key={idx} className="p-4 bg-white rounded-lg shadow-md mb-4 dark:bg-gray-500 dark:text-white">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-medium">Client Name: {client.clientName}</h3>
+                  </div>
+                  <button className="btn-indigo" onClick={() => handleClientClick(client._id)}>
+                    {selectedClientId === client._id ? 'Close Description' : 'Open Description'}
+                  </button>
                 </div>
-                <button className="btn-indigo" onClick={() => handleClientClick(client._id)}>
-                  {selectedClientId === client._id ? 'Close Description' : 'Open Description'}
-                </button>
-              </div>
-              {selectedClientId === client._id && <ClientDescription description={client.description} />}
-            </li>
-          ))}
-        </ul>
+                {selectedClientId === client._id && <ClientDescription description={client.description} />}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-8">
+            <svg className="w-16 h-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path>
+            </svg>
+            <p className="text-lg font-medium text-gray-400">No cases found yet.</p>
+          </div>
+        )}
       </div>
+
     </div>
   );
 };
