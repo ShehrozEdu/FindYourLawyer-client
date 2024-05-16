@@ -176,9 +176,6 @@ export default function NewUSerNavBar() {
     if (!formData.Password) {
       newErrors.Password = "Password is required";
       valid = false;
-    } else if (formData.Password.length < 8) {
-      newErrors.Password = "Password must be at least 8 characters long";
-      valid = false;
     }
 
     setErrors(newErrors);
