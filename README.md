@@ -17,6 +17,7 @@ Find your Lawyer front-end is a single-page application that provides an intuiti
   <li>Lawyer search by location and legal category</li>
   <li>Lawyer profiles with details such as experience, fees, and contact information</li>
   <li>Booking system to schedule appointments with lawyers</li>
+  <li>Lawyers can create, read, update, and delete their own blogs.</li>
   <li>Payment integration using Razorpay</li>
 </ul>
 
