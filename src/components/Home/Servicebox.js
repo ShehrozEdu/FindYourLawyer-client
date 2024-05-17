@@ -63,8 +63,8 @@ export default function ServiceBox() {
         </div>
         <div className="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-8 md:mb-2 items-center text-center">
           <Link to="/books">
-            <h1 className="title-font sm:text-3xl text-4xl mb-4 font-bold text-amber-600 hover:text-amber-900 cursor-pointer">
-              STUDENTS CORNER
+            <h1 className="title-font sm:text-3xl text-4xl mb-4 font-bold text-amber-600 hover:text-amber-900 cursor-pointer uppercase">
+            Legal Library
             </h1>
           </Link>
           <p className="mb-8 text-stone-600 text-xl leading-relaxed Crimson dark:text-white">

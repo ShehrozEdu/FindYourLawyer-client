@@ -89,12 +89,12 @@ export default function Article() {
         <div className="container px-5 py-24 mx-auto flex">
           {!editable ? (
             <div className="xl:w-1/2 lg:w-3/4 w-full mx-auto text-center">
-              <h2 className="text-gray-900 font-medium title-font tracking-wider lg:text-3xl text-xl">
+              <h2 className="text-gray-900 font-medium title-font tracking-wider lg:text-3xl text-xl dark:text-white">
                 {blog?.title}
               </h2>
 
               <span className="inline-block h-1 w-20 rounded bg-indigo-500 mt-8 mb-6"></span>
-              <div className="leading-relaxed text-lg">{blog?.content}</div>
+              <div className="leading-relaxed text-lg dark:text-white">{blog?.content}</div>
             </div>
           ) : (
             <div className="bg-white shadow-md rounded-lg p-6 xl:w-1/2 lg:w-3/4 w-full mx-auto text-center">
@@ -176,8 +176,10 @@ export default function Article() {
           </div>
         </div>
       </section>
-      <h1 className="text-3xl text-center mb-10 font-bold"> Other Articles</h1>
-      <div className="flex flex-wrap">{/* <ArticleReuse articles={}/> */}</div>
+      {/* <h1 className="text-3xl text-center mb-10 font-bold"> Other Articles</h1>
+      <div className="flex flex-wrap">
+        <ArticleReuse articles={}/>
+        </div> */}
     </>
   );
 }
