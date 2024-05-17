@@ -7,7 +7,7 @@ export default function BooksBox(props) {
       <div className="p-4 lg:w-1/2 sm: w-1/2">
         <div className="h-full flex sm:flex-row flex-col items-center sm:justify-start justify-center text-center sm:text-left">
           <img
-            alt="team"
+            alt={`book-${books.title}`}
             className="flex-shrink-0 rounded-lg w-48 h-48 object-cover object-center sm:mb-0 mb-3"
             src={books.image}
           />

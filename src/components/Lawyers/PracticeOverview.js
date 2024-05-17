@@ -87,7 +87,6 @@ export default function PracticeOverview() {
             title: "Payment Successful",
           }).then(() => {
             setDialogOpen(true);
-           
           });
         } else {
           alert("Payment fails, try again.");
@@ -318,12 +317,9 @@ export default function PracticeOverview() {
                                             <p className="leading-relaxed mb-2 text-gray-900 dark:text-white">
                                               <b>Email: </b> {lawyer.Email}
                                             </p>
+                                           
                                             <span className="leading-relaxed mb-2 text-gray-900 dark:text-white">
-                                              <b>Ratings: </b>{" "}
-                                              {lawyer.ratings || 0}
-                                            </span>
-                                            <span className="leading-relaxed mb-2 text-gray-900 dark:text-white">
-                                              <b>Fee(Overall)*: </b>{" "}
+                                              <b>Consultation Fee: </b>{" "}
                                               {lawyer.FeePerCase} INR
                                             </span>
                                             <div className="flex justify-center">
@@ -345,7 +341,7 @@ export default function PracticeOverview() {
                                             <img
                                               className="object-cover object-center rounded"
                                               alt="hero"
-                                              src={lawyer.Image}
+                                              src="/img/avatar/1.jpg"
                                             />
                                           </div>
                                         </div>
@@ -376,10 +372,11 @@ export default function PracticeOverview() {
                           </div>
                           <Dialog
                             open={dialogOpen}
+                            className="dark:bg-gray-500"
                             size="sm"
                             onClose={() => setDialogOpen(false)}
                           >
-                            <DialogHeader className="text-lg">
+                            <DialogHeader className="text-lg dark:text-white">
                               Give a description
                             </DialogHeader>
                             <DialogBody>
@@ -390,6 +387,7 @@ export default function PracticeOverview() {
                                 <textarea
                                   rows="4"
                                   cols="50"
+                                  className="dark:bg-gray-300 dark:text-black"
                                   value={caseDescription}
                                   onChange={(e) =>
                                     setCaseDescription(e.target.value)
