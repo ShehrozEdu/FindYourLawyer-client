@@ -82,7 +82,10 @@ export default function Article() {
       console.error(error);
     }
   };
-
+const loggedInOrNot=JSON.parse(localStorage.getItem("auth_token1"||"auth_token2"))
+const matchUsersId=JSON.parse(localStorage.getItem("auth_token1"||"auth_token2"))?._id
+// console.log(matchUsersId)
+// console.log(blog)
   return (
     <>
       <section className="text-gray-600 body-font">
@@ -151,7 +154,7 @@ export default function Article() {
               </div>
             </div>
           )}
-          <div className="cursor-pointer">
+          {loggedInOrNot&&<div className="cursor-pointer">
             <Popover placement="bottom">
               <PopoverHandler>
                 <span>
@@ -159,7 +162,8 @@ export default function Article() {
                 </span>
               </PopoverHandler>
               <PopoverContent>
-                <div
+               {matchUsersId===blog?.lawyerId?._id ?
+               <> <div
                   onClick={() => setEditable(!editable)}
                   className="cursor-pointer py-2 px-4 hover:bg-gray-100"
                 >
@@ -170,10 +174,11 @@ export default function Article() {
                   className="cursor-pointer py-2 px-4 hover:bg-gray-100"
                 >
                   Delete
-                </div>
+                </div></>:
+                <button onClick={()=>alert("Reported")}>Report</button>}
               </PopoverContent>
             </Popover>
-          </div>
+          </div>}
         </div>
       </section>
       {/* <h1 className="text-3xl text-center mb-10 font-bold"> Other Articles</h1>
