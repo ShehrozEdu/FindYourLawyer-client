@@ -35,10 +35,10 @@ export default function Bookings() {
         <div className="container px-5 py-10 mx-auto">
           <div className="flex flex-col text-center w-full mb-20">
             <h1 className="sm:text-4xl text-3xl font-bold title-font mb-4 text-[#e7aa40] underline Crimson">
-              Book according to the need!
+            Guaranteed Excellence at Competitive Rates
             </h1>
             <p className="lg:w-2/3 mx-auto leading-relaxed text-base dark:text-white">
-              We Promise you the best and at cheaper price!
+            Book the perfect lawyer tailored to your specific requirements. We ensure top-quality legal services at affordable prices.
             </p>
           </div>
           {/* <!-- SearchComponent --> */}
