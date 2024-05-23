@@ -1,9 +1,7 @@
-import axios from "axios";
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-
-import LawyersListBox from "./LawyerListBox";
 import axiosInstance from "../Auth/AxiosInstance";
+import { useParams } from "react-router-dom";
+import LawyersListBox from "./LawyerListBox";
 
 export default function LawyersList() {
   const [lawyersList, setLawyersList] = useState([]);

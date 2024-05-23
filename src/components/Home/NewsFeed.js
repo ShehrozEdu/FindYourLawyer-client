@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import NewsBox from "./NewsBox";
 import axiosInstance from "../Auth/AxiosInstance";
+import NewsBox from "./NewsBox";
 
 export default function NewsFeed() {
   let [news, setNews] = useState([]);

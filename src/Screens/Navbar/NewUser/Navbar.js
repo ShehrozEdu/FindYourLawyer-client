@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
+import axiosInstance from "../../../components/Auth/AxiosInstance";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import jwt_decode from "jwt-decode";
-import axios from "axios";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { GoogleLogin } from "@react-oauth/google";
 import Swal from "sweetalert2";
@@ -18,7 +18,6 @@ import {
   PopoverHandler,
   PopoverContent,
 } from "@material-tailwind/react";
-import axiosInstance from "../../../components/Auth/AxiosInstance";
 
 export default function NewUSerNavBar() {
   const { setUserLogin, showModal, setShowModal, userLogin, setUserLawyerToggle, userLawyerToggle } =

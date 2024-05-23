@@ -1,5 +1,4 @@
 import React from "react";
-// import axios from "axios";
 import Swal from "sweetalert2";
 import emailjs from "emailjs-com";
 export default function ContactUsForm() {

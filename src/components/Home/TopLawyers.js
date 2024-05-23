@@ -1,7 +1,6 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
-import TopLawyersBox from "./TopLawyersBox";
 import axiosInstance from "../Auth/AxiosInstance";
+import TopLawyersBox from "./TopLawyersBox";
 
 export default function TopLawyers() {
   let [TopLawyers, setTopLawyer] = useState([]);

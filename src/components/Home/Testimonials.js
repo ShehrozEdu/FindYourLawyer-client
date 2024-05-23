@@ -1,8 +1,6 @@
-import React from "react";
-import { useState, useEffect } from "react";
-import TestimonialBox from "./TestimonialBox";
-import axios from "axios";
+import React,{ useState, useEffect } from "react";
 import axiosInstance from "../Auth/AxiosInstance";
+import TestimonialBox from "./TestimonialBox";
 export default function Testimonials() {
   let [testimonial, setTestimonial] = useState([]);
 
