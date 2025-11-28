@@ -1,21 +1,13 @@
-import React, { useContext, useEffect, useState } from "react";
-import jwt_decode from "jwt-decode";
-import { ThemeContext } from "./darkMode/ThemeContext";
-
-import {
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Input,
-  Typography,
-} from "@material-tailwind/react";
-import { useNavigate } from "react-router";
+import React, { useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import axiosInstance from "./Auth/AxiosInstance";
 
-const Signup = () => {
+export default function Signup() {
+  const { signup } = useAuth();
+  const navigate = useNavigate();
+
+  const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     FirstName: "",
     LastName: "",
@@ -28,350 +20,387 @@ const Signup = () => {
     State: "",
   });
 
-  const [errors, setErrors] = useState({
-    FirstName: "",
-    LastName: "",
-    Email: "",
-    Password: "",
-    Expertise: "",
-    FeePerCase: "",
-    ContactNumber: "",
-    State: "",
-  });
-
-  const { setUserLogin, userLogin, setUserLawyerToggle, setShowModal } =
-    useContext(ThemeContext);
+  const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
+    setFormData((prev) => ({
+      ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
-
-    // Validate fields
-    const newErrors = { ...errors };
-    switch (name) {
-      case "FirstName":
-        newErrors.FirstName = value ? "" : "First Name is required";
-        break;
-      case "LastName":
-        newErrors.LastName = value ? "" : "Last Name is required";
-        break;
-      case "Email":
-        newErrors.Email = value ? "" : "Email is required";
-        break;
-      case "Password":
-        newErrors.Password = value ? "" : "Password is required";
-        break;
-      case "Expertise":
-        newErrors.Expertise =
-          formData.isLawyer && !value ? "Expertise is required" : "";
-        break;
-      case "FeePerCase":
-        newErrors.FeePerCase =
-          formData.isLawyer && !value ? "Fee per case is required" : "";
-        break;
-      case "ContactNumber":
-        newErrors.ContactNumber =
-          formData.isLawyer && !value ? "Contact Number is required" : "";
-        break;
-      case "State":
-        newErrors.State = value ? "" : "State is required";
-        break;
-
-      default:
-        break;
-    }
-    setErrors(newErrors);
-  };
-
-  let newErrors;
-  let userDataLocal;
-  const navigate = useNavigate();
-
-  const fetchData = async () => {
-    const objUser = localStorage.getItem("auth_token1");
-    console.log("OBJ", objUser);
-    if (objUser) {
-      userDataLocal = JSON.parse(objUser);
-      // setLocalNameDetails(userDataLocal.FirstName);
-      setUserLawyerToggle(userDataLocal.isLawyer ? true : false);
-
-      let actualToken = userDataLocal.token;
-      //   console.log(actualToken);
-      try {
-        const decoded = jwt_decode(actualToken);
-        setUserLogin(decoded);
-        //   console.log(userLogin)
-      } catch (error) {
-        console.error("Error decoding objUser:", error.message);
-        setUserLogin(null);
-      }
-    } else {
-      setUserLogin(null);
-      console.log("else", userLogin);
+    // Clear error when user types
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
-  useEffect(() => {
-    fetchData();
-  }, []);
 
-  const validateForm = () => {
-    let valid = true;
-    const newErrors = { ...errors };
-
-    // Validate First Name
-    if (!formData.FirstName) {
-      newErrors.FirstName = "First Name is required";
-      valid = false;
-    }
-
-    // Validate Last Name
-    if (!formData.LastName) {
-      newErrors.LastName = "Last Name is required";
-      valid = false;
-    }
-
-    // Validate Email
-    if (!formData.Email) {
+  const validateStep1 = () => {
+    const newErrors = {};
+    if (!formData.FirstName.trim()) newErrors.FirstName = "First name is required";
+    if (!formData.LastName.trim()) newErrors.LastName = "Last name is required";
+    if (!formData.Email.trim()) {
       newErrors.Email = "Email is required";
-      valid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.Email)) {
+      newErrors.Email = "Email is invalid";
     }
-
-    // Validate Password
     if (!formData.Password) {
       newErrors.Password = "Password is required";
-      valid = false;
     } else if (formData.Password.length < 8) {
-      newErrors.Password = "Password must be at least 8 characters long";
-      valid = false;
+      newErrors.Password = "Password must be at least 8 characters";
     }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-    // Additional validation for lawyers
-    if (formData.isLawyer) {
-      if (!formData.Expertise) {
-        newErrors.Expertise = "Expertise is required";
-        valid = false;
-      }
-      if (!formData.FeePerCase) {
-        newErrors.FeePerCase = "Fee per case is required";
-        valid = false;
-      }
-      if (!formData.ContactNumber) {
-        newErrors.ContactNumber = "Contact Number is required";
-        valid = false;
-      }
-    }
+  const validateStep2 = () => {
+    if (!formData.isLawyer) return true;
+
+    const newErrors = {};
+    if (!formData.Expertise.trim()) newErrors.Expertise = "Expertise is required";
+    if (!formData.FeePerCase) newErrors.FeePerCase = "Fee per case is required";
+    if (!formData.ContactNumber.trim()) newErrors.ContactNumber = "Contact number is required";
+    if (!formData.State.trim()) newErrors.State = "State is required";
 
     setErrors(newErrors);
-    return valid;
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNext = () => {
+    if (validateStep1()) {
+      setCurrentStep(2);
+    }
+  };
+
+  const handleBack = () => {
+    setCurrentStep(1);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) {
+    if (currentStep === 1) {
+      handleNext();
       return;
     }
 
-    try {
-      const response = await axiosInstance.post(
-        "/users/signup",
-        formData,
-        { withCredentials: true }
-      );
+    if (!validateStep2()) return;
 
-      localStorage.setItem("auth_token1", JSON.stringify(response.data.result));
+    const result = await signup(formData);
+
+    if (result.success) {
       Swal.fire({
-        position: "center",
         icon: "success",
-        title: "Signup Successful!",
+        title: "Account Created!",
+        text: "Welcome to FindYourLawyer",
         showConfirmButton: false,
         timer: 1500,
-      }).then(() => {
-        fetchData();
-        navigate("/");
-        window.location.reload();
-      });
-
-      if (response.data.result === undefined) {
-        newErrors.Email = `${errors.Email} Email already in use`;
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
+      }).then(() => window.location.href = "/");
+    } else {
       Swal.fire({
-        position: "center",
         icon: "error",
         title: "Signup Failed",
-        text:
-          error.response && error.response.data
-            ? error.response.data.message
-            : "An error occurred during signup. Please try again.",
+        text: result.error,
         showConfirmButton: true,
       });
     }
   };
 
+  const getPasswordStrength = () => {
+    const password = formData.Password;
+    if (!password) return { strength: 0, label: "", color: "" };
+
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (password.length >= 12) strength++;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[^a-zA-Z0-9]/.test(password)) strength++;
+
+    if (strength <= 2) return { strength: 33, label: "Weak", color: "bg-red-500" };
+    if (strength <= 4) return { strength: 66, label: "Medium", color: "bg-yellow-500" };
+    return { strength: 100, label: "Strong", color: "bg-green-500" };
+  };
+
+  const passwordStrength = getPasswordStrength();
+
   return (
-    <div className="border-0 rounded-lg relative flex flex-col w-full bg-white outline-none focus:outline-none dark:bg-gray-700">
-      <div className="flex justify-center items-center">
-        <div>
-          <Card className="w-96">
-            <form onSubmit={handleSubmit}>
-              <CardHeader
-                variant="gradient"
-                color="amber"
-                className="mb-4 grid h-28 place-items-center"
-              >
-                <Typography variant="h3" color="white">
-                  Sign Up
-                </Typography>
-              </CardHeader>
-              <CardBody className="flex flex-col gap-4">
-                <Input
-                  label="First Name"
-                  size="lg"
-                  name="FirstName"
-                  value={formData.FirstName}
-                  onChange={handleChange}
-                />
-                {errors.FirstName && (
-                  <Typography color="red" variant="small">
-                    {errors.FirstName}
-                  </Typography>
-                )}
-                <Input
-                  label="Last Name"
-                  size="lg"
-                  name="LastName"
-                  value={formData.LastName}
-                  onChange={handleChange}
-                />
-                {errors.LastName && (
-                  <Typography color="red" variant="small">
-                    {errors.LastName}
-                  </Typography>
-                )}
-                <Input
-                  label="Email"
-                  size="lg"
-                  name="Email"
-                  value={formData.Email}
-                  onChange={handleChange}
-                />
-                {errors.Email && (
-                  <Typography color="red" variant="small">
-                    {errors.Email}
-                  </Typography>
-                )}
-                <Input
-                  label="Password"
-                  size="lg"
-                  type="password"
-                  name="Password"
-                  value={formData.Password}
-                  onChange={handleChange}
-                />
-                {errors.Password && (
-                  <Typography color="red" variant="small">
-                    {errors.Password}
-                  </Typography>
-                )}
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="isLawyer"
-                    name="isLawyer"
-                    checked={formData.isLawyer}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="isLawyer">Are you a Lawyer?</label>
-                </div>
-                {formData.isLawyer && (
-                  <>
-                    <Input
-                      label="Expertise"
-                      size="lg"
-                      name="Expertise"
-                      value={formData.Expertise}
+    <div className="min-h-screen flex">
+      {/* Left Side - Visual */}
+      <div className="hidden lg:flex lg:w-1/2 relative bg-gray-900">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/img/signup_bg.png')" }}
+        >
+          <div className="absolute inset-0 bg-black/50"></div>
+        </div>
+        <div className="relative z-10 flex flex-col justify-center items-start p-16 text-white">
+          <h1 className="text-5xl font-bold mb-6 Crimson">
+            Join <span className="text-[#e7aa40]">FindYourLawyer</span>
+          </h1>
+          <p className="text-xl text-gray-200 max-w-md leading-relaxed mb-8">
+            Create your account and connect with top legal professionals today.
+          </p>
+          <div className="space-y-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-full bg-[#e7aa40] flex items-center justify-center">
+                <span className="text-white font-bold">✓</span>
+              </div>
+              <p className="text-gray-200">Access to verified lawyers</p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-full bg-[#e7aa40] flex items-center justify-center">
+                <span className="text-white font-bold">✓</span>
+              </div>
+              <p className="text-gray-200">Secure & confidential consultations</p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-full bg-[#e7aa40] flex items-center justify-center">
+                <span className="text-white font-bold">✓</span>
+              </div>
+              <p className="text-gray-200">24/7 legal support</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Signup Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-white p-8">
+        <div className="w-full max-w-md">
+          {/* Logo for mobile */}
+          <div className="lg:hidden text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 Crimson">
+              Find Your <span className="text-[#e7aa40]">Lawyer</span>
+            </h1>
+          </div>
+
+          {/* Signup Card */}
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
+              <p className="text-gray-600">Step {currentStep} of 2</p>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="mb-8">
+              <div className="flex justify-between mb-2">
+                <span className={`text-sm ${currentStep >= 1 ? 'text-[#e7aa40] font-semibold' : 'text-gray-400'}`}>
+                  Basic Info
+                </span>
+                <span className={`text-sm ${currentStep >= 2 ? 'text-[#e7aa40] font-semibold' : 'text-gray-400'}`}>
+                  {formData.isLawyer ? 'Lawyer Details' : 'Finish'}
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="bg-[#e7aa40] h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${(currentStep / 2) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Step 1: Basic Info */}
+              {currentStep === 1 && (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                      <input
+                        type="text"
+                        name="FirstName"
+                        value={formData.FirstName}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#e7aa40] focus:border-transparent outline-none transition"
+                        placeholder="John"
+                      />
+                      {errors.FirstName && <p className="text-red-500 text-sm mt-1">{errors.FirstName}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                      <input
+                        type="text"
+                        name="LastName"
+                        value={formData.LastName}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#e7aa40] focus:border-transparent outline-none transition"
+                        placeholder="Doe"
+                      />
+                      {errors.LastName && <p className="text-red-500 text-sm mt-1">{errors.LastName}</p>}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input
+                      type="email"
+                      name="Email"
+                      value={formData.Email}
                       onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#e7aa40] focus:border-transparent outline-none transition"
+                      placeholder="john@example.com"
                     />
-                    {errors.Expertise && (
-                      <Typography color="red" variant="small">
-                        {errors.Expertise}
-                      </Typography>
+                    {errors.Email && <p className="text-red-500 text-sm mt-1">{errors.Email}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name="Password"
+                        value={formData.Password}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#e7aa40] focus:border-transparent outline-none transition"
+                        placeholder="••••••••"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      >
+                        {showPassword ? "👁️" : "👁️‍🗨️"}
+                      </button>
+                    </div>
+                    {errors.Password && <p className="text-red-500 text-sm mt-1">{errors.Password}</p>}
+
+                    {/* Password Strength Indicator */}
+                    {formData.Password && (
+                      <div className="mt-2">
+                        <div className="flex justify-between text-xs mb-1">
+                          <span className="text-gray-600">Password strength:</span>
+                          <span className={`font-semibold ${passwordStrength.label === 'Weak' ? 'text-red-500' :
+                            passwordStrength.label === 'Medium' ? 'text-yellow-500' : 'text-green-500'
+                            }`}>{passwordStrength.label}</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-1.5">
+                          <div
+                            className={`h-1.5 rounded-full transition-all ${passwordStrength.color}`}
+                            style={{ width: `${passwordStrength.strength}%` }}
+                          ></div>
+                        </div>
+                      </div>
                     )}
-                    <Input
-                      label="Fee per case"
-                      size="lg"
-                      name="FeePerCase"
-                      value={formData.FeePerCase}
+                  </div>
+
+                  <div className="flex items-center space-x-2 pt-2">
+                    <input
+                      type="checkbox"
+                      id="isLawyer"
+                      name="isLawyer"
+                      checked={formData.isLawyer}
                       onChange={handleChange}
+                      className="w-4 h-4 text-[#e7aa40] border-gray-300 rounded focus:ring-[#e7aa40]"
                     />
-                    {errors.FeePerCase && (
-                      <Typography color="red" variant="small">
-                        {errors.FeePerCase}
-                      </Typography>
-                    )}
-                    <Input
-                      label="Contact Number"
-                      size="lg"
-                      name="ContactNumber"
-                      value={formData.ContactNumber}
-                      onChange={handleChange}
-                    />
-                    {errors.ContactNumber && (
-                      <Typography color="red" variant="small">
-                        {errors.ContactNumber}
-                      </Typography>
-                    )}
-                    <Input
-                      label="State"
-                      size="lg"
-                      name="State"
-                      value={formData.State}
-                      onChange={handleChange}
-                    />
-                    {errors.State && (
-                      <Typography color="red" variant="small">
-                        {errors.State}
-                      </Typography>
-                    )}
-                  </>
-                )}
-              </CardBody>
-              <CardFooter className="pt-0">
-                <Button
-                  type="submit"
-                  variant="gradient"
-                  className="text-white"
-                  fullWidth
-                >
-                  Sign Up
-                </Button>
-                <Typography
-                  variant="small"
-                  className="mt-6 flex justify-center"
-                >
-                  Already have an account?
-                  <Typography
-                    as="a"
-                    variant="small"
-                    color="blue-gray"
-                    className="ml-1 font-bold cursor-pointer"
-                    onClick={() => setShowModal(true)}
+                    <label htmlFor="isLawyer" className="text-sm text-gray-700 font-medium">
+                      I am a lawyer
+                    </label>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full bg-[#e7aa40] hover:bg-[#d69930] text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300 shadow-lg"
                   >
-                    Sign In
-                  </Typography>
-                </Typography>
-              </CardFooter>
+                    Continue
+                  </button>
+                </>
+              )}
+
+              {/* Step 2: Lawyer Details or Finish */}
+              {currentStep === 2 && (
+                <>
+                  {formData.isLawyer ? (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Area of Expertise</label>
+                        <input
+                          type="text"
+                          name="Expertise"
+                          value={formData.Expertise}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#e7aa40] focus:border-transparent outline-none transition"
+                          placeholder="e.g., Criminal Law, Family Law"
+                        />
+                        {errors.Expertise && <p className="text-red-500 text-sm mt-1">{errors.Expertise}</p>}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Fee Per Case ($)</label>
+                        <input
+                          type="number"
+                          name="FeePerCase"
+                          value={formData.FeePerCase}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#e7aa40] focus:border-transparent outline-none transition"
+                          placeholder="500"
+                        />
+                        {errors.FeePerCase && <p className="text-red-500 text-sm mt-1">{errors.FeePerCase}</p>}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Contact Number</label>
+                        <input
+                          type="tel"
+                          name="ContactNumber"
+                          value={formData.ContactNumber}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#e7aa40] focus:border-transparent outline-none transition"
+                          placeholder="+1 (555) 123-4567"
+                        />
+                        {errors.ContactNumber && <p className="text-red-500 text-sm mt-1">{errors.ContactNumber}</p>}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
+                        <input
+                          type="text"
+                          name="State"
+                          value={formData.State}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#e7aa40] focus:border-transparent outline-none transition"
+                          placeholder="California"
+                        />
+                        {errors.State && <p className="text-red-500 text-sm mt-1">{errors.State}</p>}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span className="text-4xl">✓</span>
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">Almost Done!</h3>
+                      <p className="text-gray-600">Click below to create your account</p>
+                    </div>
+                  )}
+
+                  <div className="flex space-x-4">
+                    <button
+                      type="button"
+                      onClick={handleBack}
+                      className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-4 rounded-lg transition-colors"
+                    >
+                      Back
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex-1 bg-[#e7aa40] hover:bg-[#d69930] text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300 shadow-lg"
+                    >
+                      Create Account
+                    </button>
+                  </div>
+                </>
+              )}
             </form>
-          </Card>
+          </div>
+
+          {/* Footer */}
+          <div className="text-center mt-8">
+            <p className="text-sm text-gray-600">
+              Already have an account? <a href="/login" className="text-[#e7aa40] hover:underline font-semibold">Sign in</a>
+            </p>
+          </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default Signup;
+}

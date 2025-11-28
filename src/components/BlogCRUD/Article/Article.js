@@ -14,6 +14,7 @@ import ArticleReuse from "./ArticleReuse";
 import Error from "../../Error";
 import Swal from "sweetalert2";
 import axiosInstance from "../../Auth/AxiosInstance";
+import { useAuth } from "../../../contexts/AuthContext";
 
 export default function Article() {
   const [blog, setBlog] = useState(null);
@@ -22,6 +23,10 @@ export default function Article() {
   const [content, setContent] = useState("");
   const [editable, setEditable] = useState(false);
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
+  
+  const loggedInOrNot = isAuthenticated;
+  const matchUsersId = user?._id;
 
   const getBlog = async () => {
     try {
@@ -82,10 +87,7 @@ export default function Article() {
       console.error(error);
     }
   };
-const loggedInOrNot=JSON.parse(localStorage.getItem("auth_token1"||"auth_token2"))
-const matchUsersId=JSON.parse(localStorage.getItem("auth_token1"||"auth_token2"))?._id
-// console.log(matchUsersId)
-// console.log(blog)
+
   return (
     <>
       <section className="text-gray-600 body-font">

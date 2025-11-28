@@ -1,52 +1,70 @@
+import { Suspense, lazy } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
-//Screens
-import HomeScreen from "./components/Home/HomeScreen";
-import Bookings from "./components/Bookings";
-import Books from "./components/Books";
 import Navbar from "./Screens/Navbar/Navbar";
-import IPC from "./components/IPCs and CRPCs/IPC";
-import LawyersList from "./components/Lawyers/LawyersList";
-import Article from "./components/BlogCRUD/Article/Article";
-import Error from "./components/Error";
-import PracticeOverview from "./components/Lawyers/PracticeOverview";
 import ProtectedRoutes from "./components/utils/PrivateRoutes";
-import LoginPage from "./components/LoginPage";
-import Blog from "./components/BlogCRUD/Article/Blog";
-import Signup from "./components/Signup";
-import Dashboard from "./components/Dashboard/Dashboard";
-import GeminiAi from "./components/GeminiAI/GeminiAi";
+import Error from "./components/Error";
+import { AuthProvider } from "./contexts/AuthContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
+
+// Lazy load screens
+const HomeScreen = lazy(() => import("./components/Home/HomeScreen"));
+const Bookings = lazy(() => import("./components/Bookings"));
+const Books = lazy(() => import("./components/Books"));
+const IPC = lazy(() => import("./components/IPCs and CRPCs/IPC"));
+const LawyersList = lazy(() => import("./components/Lawyers/LawyersList"));
+const Article = lazy(() => import("./components/BlogCRUD/Article/Article"));
+const PracticeOverview = lazy(() => import("./components/Lawyers/PracticeOverview"));
+const LoginPage = lazy(() => import("./components/LoginPage"));
+const Blog = lazy(() => import("./components/BlogCRUD/Article/Blog"));
+const Signup = lazy(() => import("./components/Signup"));
+const Dashboard = lazy(() => import("./components/Dashboard/Dashboard"));
+const ClientDashboard = lazy(() => import("./components/Dashboard/ClientDashboard"));
+const CaseDetails = lazy(() => import("./components/Cases/CaseDetails"));
+const MyBookings = lazy(() => import("./components/MyBookings"));
+const CalendarView = lazy(() => import("./components/Calendar/CalendarView"));
+const GeminiAi = lazy(() => import("./components/GeminiAI/GeminiAi"));
 
 function App() {
   return (
-    <Router>
-      <>
-        <Navbar />
-        <Routes>
-          <Route path={"/"} element={<HomeScreen />} />
-          <Route path={"/login"} element={<LoginPage />} />
-          <Route path={"/signup"} element={<Signup />} />
-          <Route path={"/bookings"} element={<Bookings />} />
-          <Route path={"/books"} element={<Books />} />
-          <Route path={"/services/ipc&crpcs"} element={<IPC />} />
-          <Route path={"/blogs"} element={<Blog />} />
-          <Route path={"/blog/:id"} element={<Article />} />
-          <Route path={"/lawyersList"} element={<LawyersList />} />
-          <Route element={<ProtectedRoutes />}>
-            <Route path={"/lawyer-dashboard"} element={<Dashboard />} />
-          </Route>
-          <Route element={<ProtectedRoutes />}>
-            <Route
-              path={"/lawyerListOverview/:id"}
-              element={<PracticeOverview />}
-            />
-          </Route>
+    <AuthProvider>
+      <NotificationProvider>
+        <Router>
+          <>
+            <Navbar />
+            <Suspense fallback={<div className="flex justify-center items-center h-screen">Loading...</div>}>
+              <Routes>
+              <Route path={"/"} element={<HomeScreen />} />
+              <Route path={"/login"} element={<LoginPage />} />
+              <Route path={"/signup"} element={<Signup />} />
+              <Route path={"/bookings"} element={<Bookings />} />
+              <Route path={"/books"} element={<Books />} />
+              <Route path={"/services/ipc&crpcs"} element={<IPC />} />
+              <Route path={"/blogs"} element={<Blog />} />
+              <Route path={"/blog/:id"} element={<Article />} />
+              <Route path={"/lawyersList"} element={<LawyersList />} />
+              <Route element={<ProtectedRoutes />}>
+                <Route path={"/lawyer-dashboard"} element={<Dashboard />} />
+                <Route path={"/client-dashboard"} element={<ClientDashboard />} />
+                <Route path={"/case-details/:caseId"} element={<CaseDetails />} />
+                <Route path={"/my-bookings"} element={<MyBookings />} />
+                <Route path={"/calendar"} element={<CalendarView />} />
+              </Route>
+              <Route element={<ProtectedRoutes />}>
+                <Route
+                  path={"/lawyerListOverview/:id"}
+                  element={<PracticeOverview />}
+                />
+              </Route>
 
-          <Route path={"*"} element={<Error />} />
-          <Route path={"/gemini"} element={<GeminiAi />} />
-        </Routes>
-      </>
-    </Router>
+              <Route path={"*"} element={<Error />} />
+              <Route path={"/gemini"} element={<GeminiAi />} />
+              </Routes>
+            </Suspense>
+          </>
+        </Router>
+      </NotificationProvider>
+    </AuthProvider>
   );
 }
 

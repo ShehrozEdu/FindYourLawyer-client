@@ -1,32 +1,31 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { ThemeContext } from "../darkMode/ThemeContext";
+import { useAuth } from "../../contexts/AuthContext";
 import Swal from "sweetalert2";
-
-const useAuth = () => {
-  const user = localStorage.getItem("auth_token1");
-  return !!user;
-};
 
 const ProtectedRoutes = () => {
   const [shouldNavigate, setShouldNavigate] = useState(false);
-  const auth = useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
   useEffect(() => {
-    if (!auth) {
+    if (!loading && !isAuthenticated) {
       Swal.fire({
         text: "Please Signup before accessing it",
       }).then(() => {
         setShouldNavigate(true);
       });
     }
-  }, [auth]);
+  }, [isAuthenticated, loading]);
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
 
   if (shouldNavigate) {
     return <Navigate to="/signup" />;
   }
 
-  return auth ? <Outlet /> : null;
+  return isAuthenticated ? <Outlet /> : null;
 };
 
 export default ProtectedRoutes;

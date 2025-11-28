@@ -1,11 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function LawyerListBox({ list }) {
-  const idOfLawyer = JSON.parse(localStorage.getItem("auth_token1"))._id;
-console.log(list._id)
+  const { user } = useAuth();
+  const idOfLawyer = user?._id;
+  
   // Conditionally render the lawyer based on ID
-  if (list._id !== idOfLawyer) {
+  if (!idOfLawyer || list._id !== idOfLawyer) {
     return null; // Hide the lawyer if IDs don't match
   }
 

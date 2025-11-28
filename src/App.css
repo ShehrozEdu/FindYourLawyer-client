@@ -2,46 +2,48 @@
 @tailwind components;
 @import url("https://fonts.googleapis.com/css2?family=Fjalla+One&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600;700&display=swap");
-html, body {
+
+html,
+body {
   @apply scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-700;
 }
+
 body {
   margin: 0;
   padding: 0;
   font-family: "Oswald", sans-serif;
   scroll-behavior: smooth;
 }
+
 @tailwind utilities;
+
 .background-clr {
   width: 100px;
   height: 100px;
   margin-top: 5.5rem;
 }
+
 .newsBack {
   background: url("../public/img/newsBack.png") no-repeat center;
 }
+
 .google {
   background-color: black !important;
 }
-.bg-img1 {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 700px;
-  background-image: url("../public/img/img1.jpg");
-  background-repeat: no-repeat;
-  background-size: cover;
-}
+
+/* .bg-img1 removed */
 .Crimson {
   font-family: "Crimson Pro", serif;
 }
+
 .Noto {
   font-family: "buffalo", sans-serif;
 }
+
 .hex {
   background-image: linear-gradient(to right, #ff9933, #ffffff, #138808);
 }
+
 .logo {
   width: 40px;
   height: 40px;
@@ -55,14 +57,17 @@ body {
   padding: 0.6rem;
   border-radius: 0.7rem;
 }
+
 .get-started {
   background-color: #51575f;
   padding: 0.6rem;
   border-radius: 0.7rem;
 }
+
 .get-started__container span:hover {
   color: white;
 }
+
 .get-started__button {
   color: black;
   display: flex;
@@ -70,10 +75,12 @@ body {
   column-gap: 0.25rem;
   cursor: pointer;
 }
+
 .get-started__button:hover .services__icon {
   transform: translate(0.25rem);
   color: white;
 }
+
 .services__icon {
   font-size: 1rem;
   transition: 0.4s;
@@ -84,9 +91,11 @@ body {
   contrast: (1.2);
   opacity: (0.4);
 }
+
 .color {
   color: #2296b9;
 }
+
 .service__img {
   width: 350px;
   height: 250px;
@@ -99,16 +108,14 @@ body {
 .heightOverview {
   height: 50vh !important;
 }
+
 /* .textP {
   font-size: 3rem;
 } */
 /* TEST */
 @media screen and (max-width: 1100px) {
-  .bg-img1 {
-    padding: 0;
-    background-position: center;
-    height: 533px;
-  }
+
+  /* .bg-img1 removed */
   .textP {
     /* font-family: "Inter", sans-serif; */
     font-size: 20px;
@@ -116,8 +123,10 @@ body {
 }
 
 .gradient-button {
-  background-image: linear-gradient(to right, #e8c32e, #cf531e); /* Adjust colors as needed */
-  color: white; /* Text color */
+  background-image: linear-gradient(to right, #e8c32e, #cf531e);
+  /* Adjust colors as needed */
+  color: white;
+  /* Text color */
   /* Add other styles such as padding, border-radius, etc. */
 }
 
@@ -126,9 +135,10 @@ body {
   z-index: 10000000 !important;
 }
 
-.bg-btn-approve{
+.bg-btn-approve {
   background-color: #61e455;
 }
-.bg-btn-reject{
+
+.bg-btn-reject {
   background-color: #f64848;
 }

@@ -9,7 +9,8 @@ import {
   DialogBody,
   DialogFooter,
 } from "@material-tailwind/react";
-import axiosInstance from "../Auth/AxiosInstance";
+import apiService from "../../utility/apiService";
+import { useAuth } from "../../contexts/AuthContext";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -34,10 +35,9 @@ export default function PracticeOverview() {
     // console.log(lawyerId)
   };
   //RAZORPAY
-  const clientName = JSON.parse(localStorage.getItem("auth_token1"))?.FirstName;
-
-  // Check if user is logged in
-  const isLoggedIn = localStorage.getItem("auth_token1") !== null;
+  const { user, isAuthenticated } = useAuth();
+  const clientName = user?.FirstName;
+  const isLoggedIn = isAuthenticated;
 
   let loadScript = async () => {
     const scriptElement = document.createElement("script");
@@ -57,13 +57,13 @@ export default function PracticeOverview() {
       return false;
     }
 
-    const clientEmail = JSON.parse(localStorage.getItem("auth_token1")).Email;
+    const clientEmail = user?.Email;
     let sendData = {
       amount: amount,
       email: clientEmail,
     };
 
-    let { data } = await axiosInstance.post("/payment", sendData);
+    let { data } = await apiService.post("/payment", sendData);
     let { order } = data;
     // console.log("data sent: ", sendData);
 
@@ -83,7 +83,7 @@ export default function PracticeOverview() {
           signature: response.razorpay_signature,
         };
 
-        let { data } = await axiosInstance.post("/callback", sendData);
+        let { data } = await apiService.post("/callback", sendData);
         if (data.status === true) {
           Swal.fire({
             icon: "success",
@@ -113,7 +113,7 @@ export default function PracticeOverview() {
 
   let getPracticeID = async () => {
     try {
-      let response = await axiosInstance.get("/getpracticebyid/" + params.id);
+      let response = await apiService.get("/getpracticebyid/" + params.id);
 
       let { status, Practice } = response.data;
 
@@ -133,7 +133,7 @@ export default function PracticeOverview() {
   }, []);
   let getLawyerData = async (expertise) => {
     try {
-      let response = await axiosInstance.get(
+      let response = await apiService.get(
         `/lawyersListExpertise?expertise=${expertise}`
       );
       let { status, lawyers } = response.data;
@@ -172,9 +172,8 @@ export default function PracticeOverview() {
         return;
       }
 
-      // Get client ID from local storage
-      const clientData = localStorage.getItem("auth_token1");
-      const clientId = clientData ? JSON.parse(clientData)._id : null;
+      // Get client ID from AuthContext
+      const clientId = user?._id;
 
       // Validate that a lawyer is selected
       if (!selectedLawyerId) {
@@ -198,27 +197,32 @@ export default function PracticeOverview() {
       // console.log("Case Description:", caseDescription);
       // console.log("Client Name:", clientName);
 
-      // Create a payload object
+      // Create a payload object - match backend expectations
       const payload = {
-        client: clientId,
+        clientId: clientId,
         lawyerId: selectedLawyerId,
         description: caseDescription,
         clientName: clientName,
         consultationDate: consultationDate, // Include the consultation date
       };
       // Make the API call to submit the case request
-      const response = await axiosInstance.post(
+      const response = await apiService.post(
         "/case-requests/create",
         payload
       );
 
       // Handle successful submission
-      console.log("Case request submitted successfully");
-      Swal.fire("Case request submitted successfully");
+      console.log("Case request submitted successfully:", response.data);
+      Swal.fire({
+        icon: "success",
+        title: "Booking Successful!",
+        text: "Your case request has been submitted successfully.",
+      });
       setCaseDescription("");
       setDialogOpen(false);
       if (response.status === 201) {
-        navigate("/");
+        // Navigate to my bookings page to see the new booking
+        navigate("/my-bookings");
       }
     } catch (error) {
       // Handle errors during the submission process
@@ -229,7 +233,7 @@ export default function PracticeOverview() {
     }
   };
 
-  const idOfLawyer = JSON.parse(localStorage?.getItem("auth_token1"))?._id;
+  const idOfLawyer = user?._id;
   return (
     <section className="text-gray-600 body-font dark:bg-gray-800">
       <div className="container px-5 py-5 mx-auto flex flex-col">

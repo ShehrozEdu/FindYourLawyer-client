@@ -8,7 +8,12 @@ module.exports = withMT({
     './public/index.html',
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        gmeshMain: '#2bcdc0',
+        gmeshBlue: '#010d45',
+      },
+    },
     container: {
       center: true,
       padding: {

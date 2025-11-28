@@ -13,16 +13,18 @@ import {
 } from "@material-tailwind/react";
 import Swal from "sweetalert2";
 import axiosInstance from "../../Auth/AxiosInstance";
+import { useAuth } from "../../../contexts/AuthContext";
 
 export default function Blog() {
   const [blogs, setBlogs] = useState([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [size, setSize] = React.useState(null);
+  const { user } = useAuth();
 
   const handleOpenDialogue = (value) => setSize(value);
-  const lawyerId = JSON.parse(localStorage.getItem("auth_token1"))?._id;
-  const lawyerTrue = JSON.parse(localStorage.getItem("auth_token1"))?.isLawyer;
+  const lawyerId = user?._id;
+  const lawyerTrue = user?.isLawyer;
 
   const fetchBlogs = async () => {
     try {

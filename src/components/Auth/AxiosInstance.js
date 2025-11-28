@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "https://find-your-lawyer-server.vercel.app/api",
+  baseURL: "http://localhost:5000/api",
+  withCredentials: true, // Send cookies with requests
 });
 
 axiosInstance.interceptors.request.use(

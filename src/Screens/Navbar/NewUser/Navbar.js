@@ -1,28 +1,22 @@
-import { useContext, useEffect, useState } from "react";
-import axiosInstance from "../../../components/Auth/AxiosInstance";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import jwt_decode from "jwt-decode";
+import { useContext, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { GoogleLogin } from "@react-oauth/google";
 import Swal from "sweetalert2";
 import { ThemeContext } from "../../../components/darkMode/ThemeContext";
+import { useAuth } from "../../../contexts/AuthContext";
+import NotificationBell from "../../../components/Notifications/NotificationBell";
 import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Typography,
-  Input,
-  Button,
   Popover,
   PopoverHandler,
   PopoverContent,
 } from "@material-tailwind/react";
 
 export default function NewUSerNavBar() {
-  const { setUserLogin, showModal, setShowModal, userLogin, setUserLawyerToggle, userLawyerToggle } =
-    useContext(ThemeContext);
+  const { showModal, setShowModal } = useContext(ThemeContext);
+  const { user, isAuthenticated, loading, login, logout, isLawyer, isClient } = useAuth();
   const [navbar, setNavbar] = useState(false);
+  const [showEmailLogin, setShowEmailLogin] = useState(true);
   const [formData, setFormData] = useState({
     Email: "",
     Password: "",
@@ -32,20 +26,19 @@ export default function NewUSerNavBar() {
     Password: "",
   });
 
-  let navigate = useNavigate();
   const location = useLocation();
-  let userDataLocal;
-  const [localNameDetails, setLocalNameDetails] = useState("");
+
   const navigateToSignup = () => {
     setShowModal(false);
-    navigate("/signup");
-  };
-  const navigateToHome = () => {
-    navigate("/");
+    window.location.href = "/signup";
   };
 
-  const onSuccess = (response) => {
-    localStorage.setItem("auth_token2", response.credential);
+  const navigateToHome = () => {
+    window.location.href = "/";
+  };
+
+  const onGoogleSuccess = (response) => {
+    // Handle Google login - you may need to implement this endpoint
     Swal.fire({
       position: "center",
       icon: "success",
@@ -54,16 +47,21 @@ export default function NewUSerNavBar() {
       timer: 1500,
     }).then(() => window.location.href = "/");
   };
-  let onError = () => {
-    alert("Login Failed");
+
+  const onGoogleError = () => {
+    Swal.fire({
+      position: "center",
+      icon: "error",
+      title: "Login Failed",
+      text: "Google authentication failed. Please try again.",
+      showConfirmButton: true,
+    });
   };
 
-  let logout = () => {
-    localStorage.removeItem("auth_token2") ||
-      localStorage.removeItem("auth_token1");
+  const handleLogout = async () => {
+    await logout();
     window.location.href = "/";
   };
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -71,33 +69,28 @@ export default function NewUSerNavBar() {
       ...prevState,
       [name]: value,
     }));
-    // Validate fields
-    if (name === "Email") {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        Email: !value ? "Email is required" : "",
-      }));
-    } else if (name === "Password") {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        Password: !value ? "Password is required" : "",
-      }));
-    }
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: "",
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) {
+
+    const newErrors = {};
+    if (!formData.Email) newErrors.Email = "Email is required";
+    if (!formData.Password) newErrors.Password = "Password is required";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
-    try {
-      const response = await axiosInstance.post(
-        "/users/login",
-        formData,
-        { withCredentials: true }
-      );
 
-      localStorage.setItem("auth_token1", JSON.stringify(response.data.result));
+    const result = await login(formData.Email, formData.Password);
+
+    if (result.success) {
+      setShowModal(false);
       Swal.fire({
         position: "center",
         icon: "success",
@@ -105,199 +98,149 @@ export default function NewUSerNavBar() {
         showConfirmButton: false,
         timer: 1500,
       }).then(() => window.location.href = "/");
-    } catch (error) {
-      console.error("Error:", error.message);
+    } else {
       Swal.fire({
         position: "center",
         icon: "error",
         title: "Login Failed",
-        text: error.response && error.response.data ? error.response.data.message : "Invalid credentials, please try again",
+        text: result.error,
         showConfirmButton: true,
       });
     }
   };
 
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const authToken1 = localStorage.getItem("auth_token1");
-      const authToken2 = localStorage.getItem("auth_token2");
-
-      let userDataLocal;
-
-      if (authToken1) {
-        userDataLocal = JSON.parse(authToken1);
-        setLocalNameDetails(userDataLocal.FirstName);
-        setUserLawyerToggle(userDataLocal.isLawyer ? true : false);
-        try {
-          const decoded = jwt_decode(userDataLocal.token);
-          setUserLogin(decoded);
-        } catch (error) {
-          console.error("Error decoding auth_token1:", error.message);
-          setUserLogin(null);
-        }
-      } else if (authToken2) {
-        try {
-          const decoded = jwt_decode(authToken2);
-          setUserLogin(decoded);
-          console.log(decoded);
-        } catch (error) {
-          console.error("Error decoding auth_token2:", error.message);
-          setUserLogin(null);
-        }
-      } else {
-        setUserLogin(null);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-
-
-  const validateForm = () => {
-    let valid = true;
-    const newErrors = { ...errors };
-
-    // Validate Email
-    if (!formData.Email) {
-      newErrors.Email = "Email is required";
-      valid = false;
-    } else if (
-      !formData.Email.includes("@") ||
-      !formData.Email.includes(".com")
-    ) {
-      newErrors.Email = "Email should include @ and .com";
-      valid = false;
-    }
-
-    // Validate Password
-    if (!formData.Password) {
-      newErrors.Password = "Password is required";
-      valid = false;
-    }
-
-    setErrors(newErrors);
-    return valid;
-  };
-// console.log(userLogin)
-
   return (
     <>
       {showModal ? (
         <>
-          <div className="justify-center practices-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-slate-300 dark:bg-gray-600 py-16">
-            <div className="relative w-auto my-6 mx-auto max-w-3xl ">
-              {/*content*/}
-              <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none dark:bg-gray-700">
-                {/*MODAL body*/}
-
-                <div>
-                  <div>
-                    <Card className="w-96 shadow-none">
-                      <form onSubmit={handleSubmit}>
-                        <CardHeader
-                          variant="gradient"
-                          color="amber"
-                          className="mb-4 grid h-28 place-items-center"
-                        >
-                          <Typography variant="h3" color="white">
-                            Sign In
-                          </Typography>
-                        </CardHeader>
-                        <CardBody className="flex flex-col gap-4">
-                          <Input
-                            label="Email"
-                            size="lg"
-                            name="Email"
-                            value={formData.Email}
-                            onChange={handleChange}
-                          />
-                          <Typography color="red" variant="small">
-                            {errors.Email}
-                          </Typography>
-                          <Input
-                            label="Password"
-                            size="lg"
-                            type="password"
-                            name="Password"
-                            value={formData.Password}
-                            onChange={handleChange}
-                          />
-                          <Typography color="red" variant="small">
-                            {errors.Password}
-                          </Typography>
-                        </CardBody>
-                        <CardFooter className="pt-0">
-                          <Button
-                            type="submit"
-                            variant="gradient"
-                            className="text-white"
-                            fullWidth
-                          >
-                            Sign In
-                          </Button>
-                          <Typography
-                            variant="small"
-                            className="mt-6 flex justify-center"
-                          >
-                            Don&apos;t have an account?
-                            <Typography
-                              as="a"
-                              variant="small"
-                              color="blue-gray"
-                              className="ml-1 font-bold cursor-pointer"
-                              onClick={navigateToSignup}
-                            >
-                              Sign up
-                            </Typography>
-                          </Typography>
-                        </CardFooter>
-                      </form>
-                    </Card>
-                  </div>
-                  <div>
-                    <GoogleOAuthProvider
-                      clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
-                    >
-                      <div className="lg:flex dark:bg-gray-800">
-                        <div className="lg:w-full xl:max-w-screen-sm">
-                          <div className="py-1 bg-amber-400 flex justify-center lg:justify-start lg:px-12 dark:bg-gray-800"></div>
-                          <div className="px-12 sm:px-24 md:px-48 lg:px-12 lg:mt-1 xl:px-24 xl:max-w-2xl my-16 ">
-                            <div className="flex flex-col items-center  lg:mb-0 mb-18">
-                              <p className="text-xl text-[#e7aa40] mb-3">or</p>
-
-                              <GoogleLogin
-                                shape={"circle"}
-                                onSuccess={(credentialResponse) => {
-                                  onSuccess(credentialResponse);
-                                }}
-                                onError={() => {
-                                  onError();
-                                }}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </GoogleOAuthProvider>
-                  </div>
-                </div>
-
-                {/*footer*/}
-                <div className="flex practices-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
+          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+            <div className="relative w-auto my-6 mx-auto max-w-md">
+              {/* Modal Content */}
+              <div className="border-0 rounded-2xl shadow-2xl relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                {/* Header */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-200 rounded-t">
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    Welcome Back
+                  </h3>
                   <button
-                    className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                    type="button"
+                    className="p-1 ml-auto bg-transparent border-0 text-gray-400 hover:text-gray-600 text-3xl leading-none font-semibold outline-none focus:outline-none"
                     onClick={() => setShowModal(false)}
                   >
-                    Close
+                    ×
                   </button>
+                </div>
+
+                {/* Body */}
+                <div className="relative p-8 flex-auto">
+                  <p className="text-gray-600 text-center mb-6">
+                    Sign in to continue to your account
+                  </p>
+
+                  {/* Tabs */}
+                  <div className="flex border-b border-gray-200 mb-6">
+                    <button
+                      className={`flex-1 py-2 text-center font-semibold transition-colors ${showEmailLogin
+                        ? "text-[#e7aa40] border-b-2 border-[#e7aa40]"
+                        : "text-gray-500 hover:text-gray-700"
+                        }`}
+                      onClick={() => setShowEmailLogin(true)}
+                    >
+                      Email
+                    </button>
+                    <button
+                      className={`flex-1 py-2 text-center font-semibold transition-colors ${!showEmailLogin
+                        ? "text-[#e7aa40] border-b-2 border-[#e7aa40]"
+                        : "text-gray-500 hover:text-gray-700"
+                        }`}
+                      onClick={() => setShowEmailLogin(false)}
+                    >
+                      Google
+                    </button>
+                  </div>
+
+                  {/* Email/Password Form */}
+                  {showEmailLogin ? (
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Email
+                        </label>
+                        <input
+                          type="email"
+                          name="Email"
+                          value={formData.Email}
+                          onChange={handleChange}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#e7aa40] focus:border-transparent outline-none"
+                          placeholder="your@email.com"
+                        />
+                        {errors.Email && (
+                          <p className="text-red-500 text-sm mt-1">{errors.Email}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Password
+                        </label>
+                        <input
+                          type="password"
+                          name="Password"
+                          value={formData.Password}
+                          onChange={handleChange}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#e7aa40] focus:border-transparent outline-none"
+                          placeholder="••••••••"
+                        />
+                        {errors.Password && (
+                          <p className="text-red-500 text-sm mt-1">{errors.Password}</p>
+                        )}
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="w-full bg-[#e7aa40] hover:bg-[#d69930] text-white font-bold py-2 px-4 rounded-lg transition-colors"
+                      >
+                        Sign In
+                      </button>
+                    </form>
+                  ) : (
+                    /* Google Login */
+                    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+                      <div className="flex flex-col items-center space-y-4">
+                        <GoogleLogin
+                          width={320}
+                          logo_alignment={"center"}
+                          shape={"rectangular"}
+                          size={"large"}
+                          onSuccess={(credentialResponse) => {
+                            onGoogleSuccess(credentialResponse);
+                          }}
+                          onError={() => {
+                            onGoogleError();
+                          }}
+                        />
+                        <p className="text-sm text-gray-500 text-center mt-4">
+                          By signing in, you agree to our Terms of Service and Privacy Policy
+                        </p>
+                      </div>
+                    </GoogleOAuthProvider>
+                  )}
+
+                  <div className="mt-6 text-center">
+                    <p className="text-sm text-gray-600">
+                      Don't have an account?{" "}
+                      <span
+                        className="text-[#e7aa40] hover:underline cursor-pointer font-semibold"
+                        onClick={navigateToSignup}
+                      >
+                        Sign up
+                      </span>
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+          <div className="opacity-50 fixed inset-0 z-40 bg-black"></div>
         </>
       ) : null}
       <nav className="w-full bg-white dark:bg-gray-900 shadow">
@@ -364,60 +307,201 @@ export default function NewUSerNavBar() {
                 >
                   <Link to="/">Home</Link>
                 </li>
+                
+                {/* Common Links for All Users */}
                 <li
                   className={`text-gray-700 dark:text-white ${location.pathname === "/bookings" ? "font-bold" : "font-medium"
                     } hover:text-[#e7aa40] dark:hover:text-yellow-300`}
                 >
-                  <Link to="/bookings">Lawyer Booking</Link>
+                  <Link to="/bookings">Book a Lawyer</Link>
                 </li>
-                {userLogin === null ? (
-                  <li
-                    className="text-gray-700 dark:text-white font-medium hover:text-[#e7aa40] dark:hover:text-yellow-300 cursor-pointer"
-                    onClick={() => setShowModal(true)}
-                  >
-                    Sign In
-                  </li>
-                ) : (
-                  <>
-                    <li
-                      className={`text-gray-700 dark:text-white ${location.pathname === "/gemini" ? "font-bold" : "font-medium"
-                        } hover:text-[#e7aa40] dark:hover:text-yellow-300`}
-                    >
-                      <Link to="/gemini">Try AI Chat</Link>
-                    </li>
-                    <li>
-                      <Popover placement="bottom" className="dark:bg-black">
-                        <PopoverHandler>
-                          <span className="text-gray-700  dark:text-white font-medium hover:text-[#e7aa40] dark:hover:text-yellow-300 cursor-pointer ">
-                            {localNameDetails?localNameDetails: userLogin?.name}
+                <li
+                  className={`text-gray-700 dark:text-white ${location.pathname === "/lawyersList" ? "font-bold" : "font-medium"
+                    } hover:text-[#e7aa40] dark:hover:text-yellow-300`}
+                >
+                  <Link to="/lawyersList">Lawyers</Link>
+                </li>
+                <li
+                  className={`text-gray-700 dark:text-white ${location.pathname === "/blogs" ? "font-bold" : "font-medium"
+                    } hover:text-[#e7aa40] dark:hover:text-yellow-300`}
+                >
+                  <Link to="/blogs">Blogs</Link>
+                </li>
+                <li
+                  className={`text-gray-700 dark:text-white ${location.pathname === "/books" ? "font-bold" : "font-medium"
+                    } hover:text-[#e7aa40] dark:hover:text-yellow-300`}
+                >
+                  <Link to="/books">Books</Link>
+                </li>
 
-                          </span>
-                        </PopoverHandler>
-                        <PopoverContent>
-                          {userLawyerToggle && (
-                            <Link to={"/lawyer-dashboard"}>
-                              <div className="text-gray-700 dark:text-black font-medium hover:text-[#e7aa40] dark:hover:text-yellow-300 cursor-pointer">
-                                Dashboard
+                {!loading && (
+                  <>
+                    {isAuthenticated ? (
+                      <>
+                        {/* Client-specific navigation */}
+                        {isClient && (
+                          <>
+                            <li
+                              className={`text-gray-700 dark:text-white ${location.pathname === "/client-dashboard" ? "font-bold" : "font-medium"
+                                } hover:text-[#e7aa40] dark:hover:text-yellow-300`}
+                            >
+                              <Link to="/client-dashboard">My Dashboard</Link>
+                            </li>
+                            <li
+                              className={`text-gray-700 dark:text-white ${location.pathname === "/my-bookings" ? "font-bold" : "font-medium"
+                                } hover:text-[#e7aa40] dark:hover:text-yellow-300`}
+                            >
+                              <Link to="/my-bookings">My Bookings</Link>
+                            </li>
+                          </>
+                        )}
+
+                        {/* Lawyer-specific navigation */}
+                        {isLawyer && (
+                          <>
+                            <li
+                              className={`text-gray-700 dark:text-white ${location.pathname === "/lawyer-dashboard" ? "font-bold" : "font-medium"
+                                } hover:text-[#e7aa40] dark:hover:text-yellow-300`}
+                            >
+                              <Link to="/lawyer-dashboard">Dashboard</Link>
+                            </li>
+                            <li
+                              className={`text-gray-700 dark:text-white ${location.pathname === "/calendar" ? "font-bold" : "font-medium"
+                                } hover:text-[#e7aa40] dark:hover:text-yellow-300`}
+                            >
+                              <Link to="/calendar">Calendar</Link>
+                            </li>
+                          </>
+                        )}
+
+                        {/* Notifications */}
+                        {isAuthenticated && (
+                          <li>
+                            <NotificationBell />
+                          </li>
+                        )}
+
+                        {/* User Menu Dropdown */}
+                        <li className="text-gray-700 dark:text-white hover:text-[#e7aa40] dark:hover:text-yellow-300">
+                          <Popover placement="bottom">
+                            <PopoverHandler>
+                              <button className="flex items-center space-x-2 focus:outline-none">
+                                <span className="text-gray-700 dark:text-white">
+                                  {user?.FirstName} {user?.LastName}
+                                </span>
+                                <svg
+                                  className="w-4 h-4 text-gray-700 dark:text-white"
+                                  fill="none"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                              </button>
+                            </PopoverHandler>
+                            <PopoverContent className="w-56 p-2 dark:bg-gray-800">
+                              <div className="flex flex-col space-y-1">
+                                <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+                                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                    {user?.FirstName} {user?.LastName}
+                                  </p>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                                    {user?.Email}
+                                  </p>
+                                  <p className="text-xs text-gmeshMain mt-1">
+                                    {user?.isLawyer ? 'Lawyer' : 'Client'}
+                                  </p>
+                                </div>
+                                
+                                {isClient && (
+                                  <Link
+                                    to="/client-dashboard"
+                                    className="px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                                  >
+                                    📊 My Dashboard
+                                  </Link>
+                                )}
+                                
+                                {isClient && (
+                                  <Link
+                                    to="/my-bookings"
+                                    className="px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                                  >
+                                    📋 My Bookings
+                                  </Link>
+                                )}
+
+                                {isLawyer && (
+                                  <Link
+                                    to="/lawyer-dashboard"
+                                    className="px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                                  >
+                                    📊 Lawyer Dashboard
+                                  </Link>
+                                )}
+
+                                {isLawyer && (
+                                  <Link
+                                    to="/calendar"
+                                    className="px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                                  >
+                                    📅 Calendar
+                                  </Link>
+                                )}
+
+                                {isLawyer && (
+                                  <Link
+                                    to="/blogs"
+                                    className="px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                                  >
+                                    ✍️ Write Blog
+                                  </Link>
+                                )}
+
+                                <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                                
+                                <button
+                                  onClick={handleLogout}
+                                  className="px-4 py-2 text-sm text-left text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                                >
+                                  🚪 Logout
+                                </button>
                               </div>
-                            </Link>
-                          )}
-                          <p
-                            className="text-gray-700 dark:text-black font-medium hover:text-[#e7aa40] dark:hover:text-yellow-300 cursor-pointer "
-                            onClick={logout}
+                            </PopoverContent>
+                          </Popover>
+                        </li>
+                      </>
+                    ) : (
+                      <>
+                        <li className="text-gray-700 dark:text-white hover:text-[#e7aa40] dark:hover:text-yellow-300">
+                          <button
+                            onClick={() => setShowModal(true)}
+                            className="px-4 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                           >
-                            Logout
-                          </p>
-                        </PopoverContent>
-                      </Popover>
-                    </li>
+                            Login
+                          </button>
+                        </li>
+                        <li className="text-gray-700 dark:text-white">
+                          <Link
+                            to="/signup"
+                            className="px-4 py-2 bg-[#e7aa40] text-white rounded-md hover:bg-[#d69930] transition-colors"
+                          >
+                            Sign Up
+                          </Link>
+                        </li>
+                      </>
+                    )}
                   </>
                 )}
               </ul>
-            </div>
-
           </div>
+
         </div>
-      </nav>
+      </div>
+    </nav >
     </>
   );
 }
