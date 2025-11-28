@@ -26,6 +26,7 @@ const MyBookings = lazy(() => import("./components/MyBookings"));
 const CalendarView = lazy(() => import("./components/Calendar/CalendarView"));
 const GeminiAi = lazy(() => import("./components/GeminiAI/GeminiAi"));
 const AdminDashboard = lazy(() => import("./components/Admin/AdminDashboard"));
+const LawFirmLanding = lazy(() => import("./components/Marketing/LawFirmLanding/LawFirmLanding"));
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
             <Suspense fallback={<div className="flex justify-center items-center h-screen">Loading...</div>}>
               <Routes>
               <Route path={"/"} element={<HomeScreen />} />
+              <Route path={"/for-law-firms"} element={<LawFirmLanding />} />
               <Route path={"/login"} element={<LoginPage />} />
               <Route path={"/signup"} element={<Signup />} />
               <Route path={"/bookings"} element={<Bookings />} />

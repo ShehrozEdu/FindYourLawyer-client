@@ -12,13 +12,19 @@ import {
   faMinus
 } from '@fortawesome/free-solid-svg-icons';
 
-const DashboardStats = () => {
+const DashboardStats = ({ onStatsLoaded }) => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchStats();
   }, []);
+
+  useEffect(() => {
+    if (stats && onStatsLoaded) {
+      onStatsLoaded(stats);
+    }
+  }, [stats, onStatsLoaded]);
 
   const fetchStats = async () => {
     try {

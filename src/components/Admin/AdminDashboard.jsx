@@ -6,6 +6,7 @@ import CaseManagement from './CaseManagement';
 import ReviewManagement from './ReviewManagement';
 import ActivityLogs from './ActivityLogs';
 import ContentManagement from './ContentManagement';
+import AdminAIAssistant from './AdminAIAssistant';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faChartLine, 
@@ -14,12 +15,14 @@ import {
   faStar, 
   faHistory,
   faFileAlt,
-  faSignOutAlt
+  faSignOutAlt,
+  faRobot
 } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [dashboardStats, setDashboardStats] = useState(null);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -27,6 +30,8 @@ const AdminDashboard = () => {
     await logout();
     navigate('/');
   };
+
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: faChartLine },
@@ -40,7 +45,7 @@ const AdminDashboard = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <DashboardStats />;
+        return <DashboardStats onStatsLoaded={setDashboardStats} />;
       case 'users':
         return <UserManagement />;
       case 'cases':
@@ -52,7 +57,7 @@ const AdminDashboard = () => {
       case 'content':
         return <ContentManagement />;
       default:
-        return <DashboardStats />;
+        return <DashboardStats onStatsLoaded={setDashboardStats} />;
     }
   };
 
@@ -95,6 +100,21 @@ const AdminDashboard = () => {
                 <span className="font-medium">{item.label}</span>
               </button>
             ))}
+            
+            {/* AI Assistant Button in Sidebar */}
+            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => setShowAIAssistant(!showAIAssistant)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                  showAIAssistant
+                    ? 'bg-gmeshMain text-white shadow-md'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                <FontAwesomeIcon icon={faRobot} className="w-5 h-5" />
+                <span className="font-medium">AI Assistant</span>
+              </button>
+            </div>
           </nav>
         </aside>
 
@@ -103,6 +123,13 @@ const AdminDashboard = () => {
           {renderContent()}
         </main>
       </div>
+
+      {/* AI Assistant - Available on all admin pages */}
+      <AdminAIAssistant 
+        dashboardStats={dashboardStats} 
+        isOpen={showAIAssistant}
+        onClose={() => setShowAIAssistant(false)}
+      />
     </div>
   );
 };
