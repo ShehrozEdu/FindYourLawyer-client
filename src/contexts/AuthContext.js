@@ -126,12 +126,22 @@ export const AuthProvider = ({ children }) => {
         return user?.isLawyer === false || (user && !user.isLawyer);
     }, [user]);
 
+    const isAdmin = useMemo(() => {
+        return user?.isAdmin === true || user?.isSuperAdmin === true;
+    }, [user]);
+
+    const isSuperAdmin = useMemo(() => {
+        return user?.isSuperAdmin === true;
+    }, [user]);
+
     const value = {
         user,
         loading,
         isAuthenticated,
         isLawyer,
         isClient,
+        isAdmin,
+        isSuperAdmin,
         login,
         signup,
         loginWithGoogle,

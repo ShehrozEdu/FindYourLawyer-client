@@ -1,35 +1,25 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
 
 export default function LawyerListBox({ list }) {
-  const { user } = useAuth();
-  const idOfLawyer = user?._id;
-  
-  // Conditionally render the lawyer based on ID
-  if (!idOfLawyer || list._id !== idOfLawyer) {
-    return null; // Hide the lawyer if IDs don't match
-  }
-
   return (
     <div className="p-4 md:w-1/3 sm:mb-0 mb-6">
       <div className="rounded-lg h-64 overflow-hidden">
-        {/* Assuming your lawyer object has an image property */}
         <img
-          alt="content"
-          className="object-cover object-center h-full w-50"
-          src={list.image ? `/img${list.image}` : "/placeholder-image.jpg"}
+          alt={`${list.FirstName} ${list.LastName}`}
+          className="object-cover object-center h-full w-full"
+          src={list.image ? `/img${list.image}` : "/img/avt/1.jpg"}
+          onError={(e) => {
+            e.target.src = "/img/avt/1.jpg";
+          }}
         />
       </div>
-      {/* Assuming your lawyer object has a name property */}
       <Link to="/bookyourlawyer" className="cursor-pointer">
         <h2 className="text-xl font-medium title-font text-gray-900 mt-5 cursor-pointer">
           {list.FirstName} {list.LastName}
         </h2>
       </Link>
-      {/* Assuming your lawyer object has a state property */}
-      <p className="text-base leading-relaxed mt-2">{list.state}</p>
-      {/* Assuming your lawyer object has a practice property */}
+      <p className="text-base leading-relaxed mt-2">{list.State || list.state}</p>
       <p className="text-stone-500 inline-flex items-center mt-3">
         {list.Expertise}
       </p>

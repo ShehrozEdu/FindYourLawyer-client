@@ -14,7 +14,7 @@ import {
 
 export default function NewUSerNavBar() {
   const { showModal, setShowModal } = useContext(ThemeContext);
-  const { user, isAuthenticated, loading, login, logout, isLawyer, isClient } = useAuth();
+  const { user, isAuthenticated, loading, login, logout, isLawyer, isClient, isAdmin, isSuperAdmin } = useAuth();
   const [navbar, setNavbar] = useState(false);
   const [showEmailLogin, setShowEmailLogin] = useState(true);
   const [formData, setFormData] = useState({
@@ -338,8 +338,18 @@ export default function NewUSerNavBar() {
                   <>
                     {isAuthenticated ? (
                       <>
+                        {/* Admin-specific navigation */}
+                        {isAdmin && (
+                          <li
+                            className={`text-gray-700 dark:text-white ${location.pathname === "/admin" ? "font-bold" : "font-medium"
+                              } hover:text-[#e7aa40] dark:hover:text-yellow-300`}
+                          >
+                            <Link to="/admin">Admin Panel</Link>
+                          </li>
+                        )}
+
                         {/* Client-specific navigation */}
-                        {isClient && (
+                        {isClient && !isAdmin && (
                           <>
                             <li
                               className={`text-gray-700 dark:text-white ${location.pathname === "/client-dashboard" ? "font-bold" : "font-medium"
@@ -412,11 +422,20 @@ export default function NewUSerNavBar() {
                                     {user?.Email}
                                   </p>
                                   <p className="text-xs text-gmeshMain mt-1">
-                                    {user?.isLawyer ? 'Lawyer' : 'Client'}
+                                    {user?.isSuperAdmin ? 'Super Admin' : user?.isAdmin ? 'Admin' : user?.isLawyer ? 'Lawyer' : 'Client'}
                                   </p>
                                 </div>
                                 
-                                {isClient && (
+                                {isAdmin && (
+                                  <Link
+                                    to="/admin"
+                                    className="px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                                  >
+                                    🛡️ Admin Panel
+                                  </Link>
+                                )}
+
+                                {isClient && !isAdmin && (
                                   <Link
                                     to="/client-dashboard"
                                     className="px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
@@ -425,7 +444,7 @@ export default function NewUSerNavBar() {
                                   </Link>
                                 )}
                                 
-                                {isClient && (
+                                {isClient && !isAdmin && (
                                   <Link
                                     to="/my-bookings"
                                     className="px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"

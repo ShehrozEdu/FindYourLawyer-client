@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Navbar from "./Screens/Navbar/Navbar";
 import ProtectedRoutes from "./components/utils/PrivateRoutes";
+import AdminRoutes from "./components/utils/AdminRoutes";
 import Error from "./components/Error";
 import { AuthProvider } from "./contexts/AuthContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
@@ -24,6 +25,7 @@ const CaseDetails = lazy(() => import("./components/Cases/CaseDetails"));
 const MyBookings = lazy(() => import("./components/MyBookings"));
 const CalendarView = lazy(() => import("./components/Calendar/CalendarView"));
 const GeminiAi = lazy(() => import("./components/GeminiAI/GeminiAi"));
+const AdminDashboard = lazy(() => import("./components/Admin/AdminDashboard"));
 
 function App() {
   return (
@@ -55,6 +57,10 @@ function App() {
                   path={"/lawyerListOverview/:id"}
                   element={<PracticeOverview />}
                 />
+              </Route>
+
+              <Route element={<AdminRoutes />}>
+                <Route path={"/admin"} element={<AdminDashboard />} />
               </Route>
 
               <Route path={"*"} element={<Error />} />
